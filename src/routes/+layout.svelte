@@ -83,7 +83,7 @@
 						Diamond Standard (EIP-2535)
 					</a>
 					<a
-						href="/"
+						href="https://github.com/mark3labs/louper-v3"
 						class="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
 					>
 						Github
