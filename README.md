@@ -67,7 +67,6 @@ Louper owes its existence and functionality to several outstanding open source l
 
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
 To get a local copy up and running follow these simple example steps.
 
 ### Prerequisites
@@ -114,6 +113,14 @@ bun --bun --hot-dev
 
 You can view your local instance by pointing your browser to:
 http://localhost:5173
+
+## Run locally with Docker
+
+You can also run Louper locally using Docker. To do so, follow these steps:
+
+```sh
+docker run --rm -it -p 3000:3000 mark3labs/louper-web
+```
 
 ## Contributing
 
