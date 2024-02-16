@@ -37,7 +37,7 @@ jobs:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
       - name: Save DigitalOcean kubeconfig with short-lived credentials
-        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 do-nyc1-hosnian-prime
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 662138bb-8236-4da5-8c6d-c602fb6eef82
 
       - name: Deploy to DigitalOcean Kubernetes
         run: kubectl apply -f $GITHUB_WORKSPACE/.k8s
