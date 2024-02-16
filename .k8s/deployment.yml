@@ -20,6 +20,7 @@ spec:
           volumeMounts:
             - mountPath: '/app/data'
               name: volume
+          imagePullPolicy: Always
       volumes:
         - name: volume
           persistentVolumeClaim:
