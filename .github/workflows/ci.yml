@@ -15,7 +15,7 @@ jobs:
 
       - name: Set version tag
         id: vars
-        run: echo "{version}={$(git log -1 --pretty=%h)}" >> $GITHUB_OUTPUT
+        run: echo "version=$(git log -1 --pretty=%h)" >> $GITHUB_OUTPUT
 
       - name: Login to DockerHub
         uses: docker/login-action@v3
