@@ -30,3 +30,17 @@ jobs:
           tags: |
             mark3labs/louper-web:${{ steps.vars.outputs.version }}
             mark3labs/louper-web:latest
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Save DigitalOcean kubeconfig with short-lived credentials
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 do-nyc1-hosnian-prime
+
+      - name: Deploy to DigitalOcean Kubernetes
+        run: kubectl apply -f $GITHUB_WORKSPACE/.k8s
+
+      - name: Verify deployment
+        run: kubectl rollout status deployment/louper-web
