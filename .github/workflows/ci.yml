@@ -30,7 +30,3 @@ jobs:
           tags: |
             mark3labs/louper-web:${{ steps.vars.outputs.version }}
             mark3labs/louper-web:latest
-
-      - name: Set version tag
-        id: vars
-        run: echo ::set-output name=version::$(git log -1 --pretty=%h)
