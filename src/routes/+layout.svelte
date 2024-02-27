@@ -23,11 +23,13 @@
 			label: chain.name
 		}))
 		.filter((f) => f.value !== 'localhost' && f.value !== 'hardhat');
+	chainOptions.push({ value: 'ethereum', label: 'Ethereum' });
 
 	$: selectedValue = chainOptions.find((f) => f.value === network)?.label ?? 'Select a chain...';
 
 	const gotoDiamond = () => {
-		goto(`/diamond/${address}?network=${network}`, { replaceState: true });
+		const networkParam = network === 'ethereum' ? 'mainnet' : network;
+		goto(`/diamond/${address}?network=${networkParam}`, { replaceState: true });
 	};
 
 	afterNavigate(() => {
