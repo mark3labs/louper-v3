@@ -38,7 +38,8 @@
 						<Button
 							variant="ghost"
 							class="p-1"
-							on:click={() => window.open(`${explorerUrl}/address/${f.address}`, '_blank').focus()}
+							href={`${explorerUrl}/address/${f.address}`}
+							target="_blank"
 						>
 							<ExternalLink />
 						</Button>

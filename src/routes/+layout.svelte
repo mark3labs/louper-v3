@@ -60,7 +60,7 @@
 		<h2 class="ml-2 text-lg font-bold text-primary">Louper - The Ethereum Diamond Inspector</h2>
 	</nav>
 	<nav class="flex flex-row items-center p-2">
-		<Button on:click={() => window.open('https://flair.dev?utm=louper', '_blank')}>
+		<Button href={'https://flair.dev?utm=louper'} target="_blank">
 			Index Your Diamond w/ Flair!
 		</Button>
 	</nav>
