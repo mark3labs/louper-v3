@@ -21,8 +21,11 @@
   import FacetsTable from './FacetsTable.svelte'
   import ReadFacetMethods from './ReadFacetMethods.svelte'
   import WriteFacetMethods from './WriteFacetMethods.svelte'
+  import { page } from '$app/stores'
+  import { browser } from '$app/environment'
 
   export let data: PageData
+  let selectedTab = $page.url.hash.replace('#', '') || 'facets'
 
   const chain: Chain = chainMap[data.chain]
   const publicClient = createPublicClient({
@@ -38,7 +41,7 @@
   onMount(async () => {
     const louper = defaultConfig({
       walletConnectProjectId: '6d8897eb4adc9e4bb2f608642115f17a',
-      chains: allChains as Chain[],
+      chains: allChains as [Chain],
     })
     await louper.init()
   })
@@ -54,6 +57,12 @@
 
   $: if ($connected && $chainId !== chain.id) {
     switchChain($wagmiConfig, { chainId: chain.id }).catch(() => disconnectWagmi())
+  }
+
+  $: {
+    if (browser) {
+      window.history.replaceState({}, '', `${$page.url.pathname}${$page.url.search}#${selectedTab}`)
+    }
   }
 </script>
 
@@ -103,7 +112,7 @@
     </p>
   </div>
   <div class="mt-5">
-    <Tabs.Root value="facets" class="w-full">
+    <Tabs.Root bind:value={selectedTab} class="w-full">
       <Tabs.List class="mb-5">
         <Tabs.Trigger value="facets" on:click={disconnect}>Facets</Tabs.Trigger>
         <Tabs.Trigger value="history" on:click={disconnect}>History</Tabs.Trigger>
