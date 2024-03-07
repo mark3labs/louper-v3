@@ -1,11 +1,11 @@
-import { drizzle } from 'drizzle-orm/bun-sqlite';
-import { migrate } from 'drizzle-orm/bun-sqlite/migrator';
-import { Database } from 'bun:sqlite';
+import { drizzle } from 'drizzle-orm/bun-sqlite'
+import { migrate } from 'drizzle-orm/bun-sqlite/migrator'
+import { Database } from 'bun:sqlite'
 
-const sqlite = new Database('./data/louper.db');
-const db = drizzle(sqlite);
+const sqlite = new Database('./data/louper.db')
+const db = drizzle(sqlite)
 
-migrate(db, { migrationsFolder: './drizzle' });
+migrate(db, { migrationsFolder: './drizzle' })
 
-console.info('Migration complete');
-process.exit(0);
+console.info('Migration complete')
+process.exit(0)
