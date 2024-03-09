@@ -18,6 +18,9 @@ import { Database } from 'bun:sqlite'
 import { diamonds } from '../../../schema'
 import { sql } from 'drizzle-orm'
 
+const sqlite = new Database('./data/louper.db')
+const db = drizzle(sqlite)
+
 export const load: PageServerLoad = async ({ params, url }) => {
   const { address } = params
   const network = <string>url.searchParams.get('network') ?? 'mainnet'
@@ -55,8 +58,6 @@ export const load: PageServerLoad = async ({ params, url }) => {
     }
 
     // Udate the database
-    const sqlite = new Database('./data/louper.db')
-    const db = drizzle(sqlite)
     await db
       .insert(diamonds)
       .values({
