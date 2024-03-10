@@ -23,6 +23,7 @@
   import WriteFacetMethods from './WriteFacetMethods.svelte'
   import { page } from '$app/stores'
   import { browser } from '$app/environment'
+  import { replaceState } from '$app/navigation'
 
   export let data: PageData
   let selectedTab = $page.url.hash.replace('#', '') || 'facets'
@@ -61,7 +62,7 @@
 
   $: {
     if (browser) {
-      window.history.replaceState({}, '', `${$page.url.pathname}${$page.url.search}#${selectedTab}`)
+      replaceState(`${$page.url.pathname}${$page.url.search}#${selectedTab}`, $page.state)
     }
   }
 </script>
