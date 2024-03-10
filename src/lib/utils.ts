@@ -91,14 +91,14 @@ export const getContractInformation = async (
     const contractData = await response.json()
 
     // Update the database
-    consola.info('Updating db cache')
-    await db.insert(contracts).values({
-      id: `${chainId}:${address}`,
-      name: contractData.name,
-      address,
-      abi: JSON.stringify(contractData.abi),
-      chainId,
-    })
+    // consola.info('Updating db cache')
+    // await db.insert(contracts).values({
+    //   id: `${chainId}:${address}`,
+    //   name: contractData.name,
+    //   address,
+    //   abi: JSON.stringify(contractData.abi),
+    //   chainId,
+    // })
 
     sqlite.close()
     return {
