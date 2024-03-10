@@ -23,7 +23,7 @@
   import WriteFacetMethods from './WriteFacetMethods.svelte'
   import { page } from '$app/stores'
   import { browser } from '$app/environment'
-  import { replaceState } from '$app/navigation'
+  import { pushState } from '$app/navigation'
 
   export let data: PageData
   let selectedTab = $page.url.hash.replace('#', '') || 'facets'
@@ -48,8 +48,13 @@
   })
 
   const disconnect = async () => {
-    if (!$connected) return
-    await disconnectWagmi()
+    if (browser) {
+      const url = `${$page.url.pathname}${$page.url.search}#${selectedTab}`
+      pushState(url, { url })
+
+      if (!$connected) return
+      await disconnectWagmi()
+    }
   }
 
   onDestroy(async () => {
@@ -58,12 +63,6 @@
 
   $: if ($connected && $chainId !== chain.id) {
     switchChain($wagmiConfig, { chainId: chain.id }).catch(() => disconnectWagmi())
-  }
-
-  $: {
-    if (browser) {
-      replaceState(`${$page.url.pathname}${$page.url.search}#${selectedTab}`, $page.state)
-    }
   }
 </script>
 

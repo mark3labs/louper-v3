@@ -54,9 +54,7 @@
       "indexes": {
         "contracts_id_unique": {
           "name": "contracts_id_unique",
-          "columns": [
-            "id"
-          ],
+          "columns": ["id"],
           "isUnique": true
         }
       },
@@ -115,9 +113,7 @@
       "indexes": {
         "diamonds_id_unique": {
           "name": "diamonds_id_unique",
-          "columns": [
-            "id"
-          ],
+          "columns": ["id"],
           "isUnique": true
         }
       },
