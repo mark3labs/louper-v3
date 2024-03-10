@@ -6,7 +6,7 @@ import { type Address } from 'viem'
 import type { Contract } from './types'
 import toast from 'svelte-french-toast'
 import Database from 'bun:sqlite'
-import { drizzle } from 'drizzle-orm/bun-sqlite'
+import { drizzle, type BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite'
 import { contracts } from '../schema'
 import { and, eq } from 'drizzle-orm'
 import consola from 'consola'
@@ -68,9 +68,26 @@ export const getContractInformation = async (
   chainId: number,
 ): Promise<Contract> => {
   try {
-    const sqlite = new Database('./data/louper.db')
-    const db = drizzle(sqlite)
+    const response = await fetch(`https://anyabi.xyz/api/get-abi/${chainId}/${address}`)
+    if (!response.ok) return { name: 'Unverified', address, abi: [] }
+    const contractData = await response.json()
 
+    return {
+      ...contractData,
+      address,
+    }
+  } catch (e) {
+    consola.error(e)
+    throw new Error('Contract not found')
+  }
+}
+
+export const getCachedContractInformation = async (
+  address: Address,
+  chainId: number,
+  db: BunSQLiteDatabase,
+): Promise<Contract> => {
+  try {
     consola.info('Fetching contract information for', address, 'on chain', chainId)
     const result = await db
       .select()
@@ -85,26 +102,19 @@ export const getContractInformation = async (
         address,
       }
     }
-
-    const response = await fetch(`https://anyabi.xyz/api/get-abi/${chainId}/${address}`)
-    if (!response.ok) return { name: 'Unverified', address, abi: [] }
-    const contractData = await response.json()
+    const contract = await getContractInformation(address, chainId)
 
     // Update the database
-    // consola.info('Updating db cache')
-    // await db.insert(contracts).values({
-    //   id: `${chainId}:${address}`,
-    //   name: contractData.name,
-    //   address,
-    //   abi: JSON.stringify(contractData.abi),
-    //   chainId,
-    // })
-
-    sqlite.close()
-    return {
-      ...contractData,
+    consola.info('Updating db cache')
+    await db.insert(contracts).values({
+      id: `${chainId}:${address}`,
+      name: contract.name,
       address,
-    }
+      abi: JSON.stringify(contract.abi),
+      chainId,
+    })
+
+    return contract
   } catch (e) {
     consola.error(e)
     throw new Error('Contract not found')

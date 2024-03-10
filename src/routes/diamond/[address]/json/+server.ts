@@ -1,5 +1,9 @@
 import type { FacetData, Contract, Diamond } from '$lib/types'
-import { getContractInformation, getFuncSigBySelector } from '$lib/utils'
+import {
+  getCachedContractInformation,
+  getContractInformation,
+  getFuncSigBySelector,
+} from '$lib/utils'
 import { error, json } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
 import {
@@ -13,12 +17,12 @@ import {
 } from 'viem'
 import type { Chain } from 'viem/chains'
 import { chainMap } from '$lib/chains'
-import { drizzle } from 'drizzle-orm/bun-sqlite'
+import { drizzle, type BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite'
 import { Database } from 'bun:sqlite'
 import { diamonds } from '../../../../schema'
 import { sql } from 'drizzle-orm'
 
-export const GET: RequestHandler = async ({ params, url }) => {
+export const GET: RequestHandler = async ({ params, url, locals }) => {
   const { address } = params
   const network = <string>url.searchParams.get('network') ?? 'mainnet'
 
@@ -42,13 +46,13 @@ export const GET: RequestHandler = async ({ params, url }) => {
 
     // Build the diamond
     const diamond: Diamond = {
-      ...(await getContractInformation(getAddress(address), chain.id)),
+      ...(await getCachedContractInformation(getAddress(address), chain.id, locals.db)),
       facets: [],
     }
 
     // Fetch all facet information
     for (const [address, selectors] of facetData) {
-      const facet = await buildFacet(address, selectors, chain.id)
+      const facet = await buildFacet(address, selectors, chain.id, locals.db)
       if (!facet) continue
       diamond.facets.push(facet)
       diamondAbi = [...diamondAbi, ...facet.abi]
@@ -90,8 +94,9 @@ const buildFacet = async (
   address: Address,
   selectors: string[],
   chainId: number,
+  db: BunSQLiteDatabase,
 ): Promise<Contract | undefined> => {
-  const facet: Contract = await getContractInformation(address, chainId)
+  const facet: Contract = await getCachedContractInformation(address, chainId, db)
 
   const abiSigs = []
   if (!facet.abi.length) {
