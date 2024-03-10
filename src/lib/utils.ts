@@ -98,6 +98,7 @@ export const getContractInformation = async (
       chainId,
     })
 
+    sqlite.close()
     return {
       ...contractData,
       address,

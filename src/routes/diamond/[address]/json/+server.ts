@@ -73,6 +73,8 @@ export const GET: RequestHandler = async ({ params, url }) => {
         },
       })
 
+    sqlite.close()
+
     return json({
       chain: network,
       diamond,
