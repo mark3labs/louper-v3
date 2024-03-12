@@ -7,6 +7,11 @@ const allChains: Chain[] = []
 for (const [k, v] of Object.entries(chains)) {
   if (typeof v !== 'object') continue
   if (!('id' in v)) continue
+  if (v.id.toString() === '31337') continue
+  if (k === 'localhost') continue
+  if (k.includes('wanchain')) continue
+  if (k === 'saigon') continue
+  if (k === 'skale') continue
   chainMap[k] = v
   allChains.push(v)
 }

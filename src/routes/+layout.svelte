@@ -3,7 +3,7 @@
   import '../app.postcss'
   import { Check, ChevronUp, MagnifyingGlass } from 'radix-icons-svelte'
   import type { Address } from 'viem'
-  import * as allChains from 'viem/chains'
+  import { chainMap } from '$lib/chains'
   import * as Popover from '$lib/components/ui/popover'
   import { afterNavigate, goto } from '$app/navigation'
   import { navigating } from '$app/stores'
@@ -17,12 +17,10 @@
   let address: Address | undefined
   let searchOpen = false
 
-  const chainOptions = Object.entries(allChains)
-    .map(([key, chain]) => ({
-      value: key,
-      label: chain.name,
-    }))
-    .filter((f) => f.value !== 'localhost' && f.value !== 'hardhat')
+  const chainOptions = Object.entries(chainMap).map(([key, chain]) => ({
+    value: key,
+    label: chain.name,
+  }))
   chainOptions.push({ value: 'ethereum', label: 'Ethereum' })
 
   $: selectedValue = chainOptions.find((f) => f.value === network)?.label ?? 'Select a chain...'
