@@ -11,7 +11,7 @@ for (const [k, v] of Object.entries(chains)) {
   if (k === 'localhost') continue
   if (k.includes('wanchain')) continue
   if (k === 'saigon') continue
-  if (k === 'skale') continue
+  if (k.includes('skale')) continue
   chainMap[k] = v
   allChains.push(v)
 }
