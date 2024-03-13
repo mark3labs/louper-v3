@@ -104,6 +104,11 @@ export const getCachedContractInformation = async (
     }
     const contract = await getContractInformation(address, chainId)
 
+    // Don't cache unverified contracts
+    if (contract.name === 'Unverified') {
+      return contract
+    }
+
     // Update the database
     consola.info('Updating db cache')
     await db.insert(contracts).values({
