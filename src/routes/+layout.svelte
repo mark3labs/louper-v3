@@ -12,6 +12,8 @@
   import { tick } from 'svelte'
   import { cn } from '$lib/utils'
   import { Button } from '$lib/components/ui/button'
+  import * as Alert from '$lib/components/ui/alert'
+  import Terminal from 'lucide-svelte/icons/terminal'
 
   let network: string | undefined
   let address: Address | undefined
@@ -64,7 +66,16 @@
   </nav>
 </div>
 
-<div class="container pt-20">
+<div class="pt-20 container max-w-2xl">
+  <Alert.Root class="p-5">
+    <Terminal class="h-8 w-8" />
+    <Alert.Title class="ml-2 text-xl">Try Louper CLI!</Alert.Title>
+    <Alert.Description class="ml-2 font-mono text-opacity-25 before:content-['$']">
+      &nbsp;npm install -g @mark3labs/louper-cli@latest
+    </Alert.Description>
+  </Alert.Root>
+</div>
+<div class="container pt-10">
   <div class="my-24 rounded-[0.5rem] border shadow-sm shadow-primary">
     <div class="border-b">
       <div class="flex h-16 items-center p-5">
