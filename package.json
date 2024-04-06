@@ -40,7 +40,7 @@
     "@safe-global/safe-apps-sdk": "^8.1.0",
     "@wagmi/connectors": "^4.1.10",
     "@wagmi/core": "^2.6.1",
-    "@web3modal/wagmi": "latest",
+    "@web3modal/wagmi": "^4.1.5",
     "bits-ui": "^0.9.8",
     "clsx": "^2.0.0",
     "cmdk-sv": "^0.0.4",
