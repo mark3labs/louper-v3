@@ -6,15 +6,15 @@
   import { Label } from '$lib/components/ui/label'
   import * as Select from '$lib/components/ui/select'
   import * as Table from '$lib/components/ui/table'
-  import type { ArgsResult, Diamond } from '$lib/types'
-  import { copyToClipboard } from '$lib/utils'
-  import { getWalletClient, getPublicClient } from '@wagmi/core'
+  import { connected, wagmiConfig } from '$lib/stores/wagmi'
+  import type { ArgsResult, Diamond, FacetSelection } from '$lib/types'
+  import { abiMethods, copyToClipboard } from '$lib/utils'
+  import { getPublicClient, getWalletClient } from '@wagmi/core'
   import type { AbiFunction } from 'abitype'
   import { CaretSort, Copy, SketchLogo } from 'radix-icons-svelte'
   import { getContext } from 'svelte'
   import Tags from 'svelte-tags-input'
-  import { connected, wagmiConfig } from '$lib/stores/wagmi'
-  import { toFunctionSelector, parseEther, type WriteContractReturnType } from 'viem'
+  import { parseEther, toFunctionSelector, type WriteContractReturnType } from 'viem'
   import type { Chain } from 'viem/chains'
   import ConnectWallet from './ConnectWallet.svelte'
 
@@ -27,9 +27,10 @@
 
   const publicClient = getContext<ReturnType<typeof getPublicClient>>('publicClient')
 
-  const onFacetChange = (s: { value: AbiFunction[]; label: string; disable: false }) => {
-    activeAbi = s.value
-    selectedFacet = s.label
+  const onFacetChange = (s: unknown) => {
+    const selection = <FacetSelection>s
+    activeAbi = selection.value
+    selectedFacet = selection.label
     for (const [idx] of Object(activeAbi).entries()) {
       argsResults[idx] = { args: [], result: null, error: undefined }
     }
@@ -51,7 +52,11 @@
       const transaction = await publicClient.waitForTransactionReceipt({ hash })
       argsResults[idx].result = transaction
     } catch (e) {
-      argsResults[idx].error = (e as Error).toString()
+      if (e instanceof Error) {
+        argsResults[idx].error = e.toString()
+      } else {
+        argsResults[idx].error = 'An unknown error occurred'
+      }
       console.error(e)
     } finally {
       busy = false
@@ -64,11 +69,9 @@
       return {
         name: f.name,
         address: f.address,
-        abi: f.abi
-          .filter((i) => i.type === 'function')
-          .filter(
-            (i) => i.stateMutability !== 'view' && i.stateMutability !== 'pure',
-          ) as AbiFunction[],
+        abi: abiMethods(f.abi).filter(
+          (i) => i.stateMutability !== 'view' && i.stateMutability !== 'pure',
+        ) as AbiFunction[],
       }
     })
     .filter((f) => f.abi.length > 0)

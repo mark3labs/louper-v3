@@ -1,9 +1,5 @@
 import type { FacetData, Contract, Diamond } from '$lib/types'
-import {
-  getCachedContractInformation,
-  getContractInformation,
-  getFuncSigBySelector,
-} from '$lib/utils'
+import { getCachedContractInformation, getFuncSigBySelector } from '$lib/utils'
 import { error } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
 import {
@@ -17,8 +13,7 @@ import {
 } from 'viem'
 import type { Chain } from 'viem/chains'
 import { chainMap } from '$lib/chains'
-import { drizzle, type BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite'
-import { Database } from 'bun:sqlite'
+import { type BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite'
 import { diamonds } from '../../../schema'
 import { sql } from 'drizzle-orm'
 
