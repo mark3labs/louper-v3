@@ -12,7 +12,7 @@
     type FacetCut,
     type UpgradeStrategy,
   } from '$lib/types'
-  import { copyToClipboard, getContractInformation } from '$lib/utils'
+  import { abiMethods, copyToClipboard, getContractInformation } from '$lib/utils'
   import { Copy } from 'radix-icons-svelte'
   import { getContext } from 'svelte'
   import {
@@ -167,16 +167,14 @@
         // Check if the selector exists on one of the diamond's facets already
         if (
           diamond.facets.find((f) =>
-            f.abi
-              .filter((m) => m.type === 'function')
-              .find((m) => toFunctionSelector(m) === selector),
+            abiMethods(f.abi).find((m) => toFunctionSelector(m) === selector),
           )
         ) {
           // If it does, add it to the replacements list
           strategy.replacements[address] = [...strategy.replacements[address], selector]
           // And check all removals arrays and remove the selector from them
           for (const [addr, removals] of Object.entries(strategy.removals)) {
-            strategy.removals[addr] = removals.filter((r: string) => {
+            strategy.removals[addr as Address] = removals.filter((r: string) => {
               if (r !== selector) return true
               checkboxes[addr.slice(0, 5) + selector].$set({ checked: false })
               return false
@@ -337,7 +335,7 @@
   <Table.Body>
     <!-- New facets -->
     {#each newFacets as f}
-      <Table.Row class="border border-dashed border-4 border-green-400">
+      <Table.Row class="border border-dashed border-green-400">
         <Table.Cell>
           <p class="font-medium leading-none text-2xl text-primary">{f.name}</p>
           <p class="text-lg text-muted-foreground">
@@ -362,7 +360,7 @@
                 </Table.Cell>
                 <Table.Cell><Badge variant="secondary">Toggle All</Badge></Table.Cell>
               </Table.Row>
-              {#each f.abi.filter((i) => i.type === 'function') as m}
+              {#each abiMethods(f.abi) as m}
                 <Table.Row class="border-none">
                   <Table.Cell class="text-left">
                     <div>
@@ -422,7 +420,7 @@
                 </Table.Cell>
                 <Table.Cell><Badge variant="secondary">Toggle All</Badge></Table.Cell>
               </Table.Row>
-              {#each f.abi.filter((i) => i.type === 'function') as m}
+              {#each abiMethods(f.abi) as m}
                 <Table.Row class="border-none">
                   <Table.Cell class="text-left">
                     <Checkbox

@@ -6,13 +6,13 @@
   import { Label } from '$lib/components/ui/label'
   import * as Select from '$lib/components/ui/select'
   import * as Table from '$lib/components/ui/table'
-  import type { ArgsResult, Diamond } from '$lib/types'
-  import { copyToClipboard } from '$lib/utils'
+  import type { ArgsResult, Diamond, FacetSelection } from '$lib/types'
+  import { abiMethods, copyToClipboard } from '$lib/utils'
   import type { AbiFunction } from 'abitype'
   import { CaretSort, Copy, CornerBottomLeft, SketchLogo } from 'radix-icons-svelte'
   import { getContext } from 'svelte'
-  import { toFunctionSelector } from 'viem'
   import Tags from 'svelte-tags-input'
+  import { type PublicClient, toFunctionSelector } from 'viem'
 
   const diamond = getContext<Diamond>('diamond')
   let activeAbi: AbiFunction[] = []
@@ -20,15 +20,16 @@
   let argsResults: ArgsResult[] = []
   let busy = false
 
-  const onFacetChange = (s: { value: AbiFunction[]; label: string; disable: false }) => {
-    activeAbi = s.value
-    selectedFacet = s.label
+  const onFacetChange = (s: unknown) => {
+    const selection = <FacetSelection>s
+    activeAbi = selection.value
+    selectedFacet = selection.label
     for (const [idx] of Object(activeAbi).entries()) {
       argsResults[idx] = { args: [], result: null }
     }
   }
 
-  const publicClient = getContext('publicClient')
+  const publicClient = getContext<PublicClient>('publicClient')
 
   const queryContract = async (idx: number) => {
     try {
@@ -39,11 +40,15 @@
         address: diamond.address,
         abi: [activeAbi[idx]],
         functionName: activeAbi[idx].name,
-        args: argsResults[idx].args || undefined,
+        args: argsResults[idx].args,
       })
       argsResults[idx].result = data
-    } catch (e) {
-      argsResults[idx].error = e.toString()
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        argsResults[idx].error = e.toString()
+      } else {
+        argsResults[idx].error = 'An unknown error occurred'
+      }
       console.error(e)
     } finally {
       busy = false
@@ -56,11 +61,9 @@
       return {
         name: f.name,
         address: f.address,
-        abi: f.abi
-          .filter((i) => i.type === 'function')
-          .filter(
-            (i) => i.stateMutability !== 'nonpayable' && i.stateMutability !== 'payable',
-          ) as AbiFunction[],
+        abi: abiMethods(f.abi).filter(
+          (i) => i.stateMutability !== 'nonpayable' && i.stateMutability !== 'payable',
+        ),
       }
     })
     .filter((f) => f.abi.length > 0)

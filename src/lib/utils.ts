@@ -2,7 +2,7 @@ import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { cubicOut } from 'svelte/easing'
 import type { TransitionConfig } from 'svelte/transition'
-import { type Address } from 'viem'
+import { type Abi, type AbiFunction, type Address } from 'viem'
 import type { Contract } from './types'
 import toast from 'svelte-french-toast'
 import Database from 'bun:sqlite'
@@ -143,3 +143,6 @@ export const getFuncSigBySelector = async (selector: string): Promise<string> =>
 
   return 'unknown()'
 }
+
+export const abiMethods = (abi: Abi): AbiFunction[] =>
+  abi.filter((i) => i.type === 'function') as AbiFunction[]

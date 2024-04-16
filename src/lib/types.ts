@@ -1,4 +1,4 @@
-import type { Abi, Address } from 'viem'
+import type { Abi, AbiFunction, Address } from 'viem'
 
 export interface Contract {
   name: string
@@ -11,10 +11,10 @@ export interface Diamond extends Contract {
 }
 
 export interface ArgsResult {
-  args: Array<unknown> | never[]
+  args: Array<'indeterminate'> | never[]
   result: object | string | number | boolean | null
-  error: string | undefined
-  value: bigint | undefined
+  error?: string | undefined
+  value?: bigint | undefined
 }
 
 export type UpgradeStrategy = {
@@ -36,3 +36,5 @@ export interface FacetCut {
 }
 
 export type FacetData = Array<[Address, string[]]>
+
+export type FacetSelection = { value: AbiFunction[]; label: string; disable: boolean }

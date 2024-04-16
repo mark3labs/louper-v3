@@ -5,7 +5,7 @@
   import type { Diamond } from '$lib/types'
   import { Copy, CaretSort, MagnifyingGlass, ExternalLink } from 'radix-icons-svelte'
   import { getContext } from 'svelte'
-  import { copyToClipboard } from '$lib/utils'
+  import { copyToClipboard, abiMethods } from '$lib/utils'
   import * as Collapsible from '$lib/components/ui/collapsible'
   import { Badge } from '$lib/components/ui/badge'
   import Separator from '$lib/components/ui/separator/separator.svelte'
@@ -49,7 +49,7 @@
           <Collapsible.Root>
             <div class="flex items-center justify-start space-x-4">
               <Badge variant="secondary" class="font-bold">
-                {f.abi.filter((i) => i.type === 'function').length} Methods
+                {abiMethods(f.abi).length} Methods
               </Badge>
               <Collapsible.Trigger asChild let:builder>
                 <Button builders={[builder]} variant="ghost" size="sm" class="w-9 p-0">
@@ -60,7 +60,7 @@
             </div>
             <Collapsible.Content>
               <ul class="my-6 ml-6 [&>li]:mt-5">
-                {#each f.abi.filter((i) => i.type === 'function') as m}
+                {#each abiMethods(f.abi) as m}
                   <li>
                     <div class="flex h-5 items-center space-x-4 text-sm">
                       <code
