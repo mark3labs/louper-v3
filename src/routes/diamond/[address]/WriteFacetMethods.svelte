@@ -9,7 +9,7 @@
   import { connected, wagmiConfig } from '$lib/stores/wagmi'
   import type { ArgsResult, Diamond, FacetSelection } from '$lib/types'
   import { abiMethods, copyToClipboard } from '$lib/utils'
-  import { getPublicClient, getWalletClient } from '@wagmi/core'
+  import { getWalletClient, waitForTransactionReceipt } from '@wagmi/core'
   import type { AbiFunction } from 'abitype'
   import { CaretSort, Copy, SketchLogo } from 'radix-icons-svelte'
   import { getContext } from 'svelte'
@@ -24,8 +24,6 @@
   let selectedFacet: string
   let argsResults: ArgsResult[] = []
   let busy = false
-
-  const publicClient = getContext<ReturnType<typeof getPublicClient>>('publicClient')
 
   const onFacetChange = (s: unknown) => {
     const selection = <FacetSelection>s
@@ -49,7 +47,7 @@
         value: argsResults[idx].value ? parseEther(String(argsResults[idx].value)) : 0n,
         chain,
       })) as WriteContractReturnType
-      const transaction = await publicClient.waitForTransactionReceipt({ hash, timeout: 60000 })
+      const transaction = await waitForTransactionReceipt($wagmiConfig, { hash, timeout: 60000 })
       argsResults[idx].result = transaction
     } catch (e) {
       if (e instanceof Error) {

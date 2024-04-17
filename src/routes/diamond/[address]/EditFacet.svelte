@@ -27,7 +27,7 @@
   import ConnectWallet from './ConnectWallet.svelte'
   import { connected, wagmiConfig } from '$lib/stores/wagmi'
   import * as AlertDialog from '$lib/components/ui/alert-dialog'
-  import { getPublicClient, getWalletClient } from '@wagmi/core'
+  import { getWalletClient, waitForTransactionReceipt } from '@wagmi/core'
   import toast from 'svelte-french-toast'
   import * as Card from '$lib/components/ui/card'
   import { Label } from '$lib/components/ui/label'
@@ -36,7 +36,6 @@
 
   const diamond = getContext<Diamond>('diamond')
   const chain = getContext<Chain>('chain')
-  const publicClient = getContext<ReturnType<typeof getPublicClient>>('publicClient')
 
   let newFacets: Contract[] = []
   let newFacetAddress: Address | undefined
@@ -122,7 +121,7 @@
         args: [facetCuts, initAddress ?? zeroAddress, initCallData ?? '0x'],
         chain,
       })) as WriteContractReturnType
-      await publicClient.waitForTransactionReceipt({ hash, timeout: 60000 })
+      await waitForTransactionReceipt($wagmiConfig, { hash, timeout: 60000 })
       toast.success('Diamond upgraded successfully')
       await goto(
         `/diamond/${$page.params.address}?network=${
