@@ -6,6 +6,7 @@ import {
   connect,
   type GetAccountReturnType,
   type Config,
+  type Connector,
 } from '@wagmi/core'
 import { type Chain } from '@wagmi/core/chains'
 import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi'
@@ -17,7 +18,7 @@ export const connected = writable<boolean>(false)
 export const wagmiLoaded = writable<boolean>(false)
 export const chainId = writable<number | null | undefined>(null)
 export const signerAddress = writable<string | null>(null)
-export const configuredConnectors = writable<any[]>([])
+export const configuredConnectors = writable<Connector[]>([])
 export const loading = writable<boolean>(true)
 export const web3Modal = writable<Web3Modal>()
 export const wagmiConfig = writable<Config>()
@@ -124,27 +125,6 @@ export const disconnectWagmi = async () => {
   loading.set(false)
 }
 
-// const waitForAccount = () => {
-// 	return new Promise((resolve, reject) => {
-//     get(web3Modal).
-// 		const unsub1 = get(web3Modal).subscribeModal((newState) => {
-// 			if (!newState.open) {
-// 				reject('modal closed');
-// 				unsub1();
-// 			}
-// 		});
-// 		const unsub = watchAccount(get(wagmiConfig) as Config, (account) => {
-// 			if (account?.isConnected) {
-// 				// Gottem, resolve the promise w/user's selected & connected Acc.
-// 				resolve(account);
-// 				unsub();
-// 			} else {
-// 				console.warn('🔃 - No Account Connected Yet...');
-// 			}
-// 		});
-// 	});
-// };
-
 const waitForConnection = (): Promise<GetAccountReturnType> =>
   new Promise((resolve, reject) => {
     const attemptToGetAccount = () => {
@@ -160,7 +140,7 @@ const waitForConnection = (): Promise<GetAccountReturnType> =>
     attemptToGetAccount()
   })
 
-export function getConnectorbyID(id: string): any | null {
+export function getConnectorbyID(id: string): Connector | null {
   for (const obj of get(configuredConnectors)) {
     if (obj.id === id) {
       return obj

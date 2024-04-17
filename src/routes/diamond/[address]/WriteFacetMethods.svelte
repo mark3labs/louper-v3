@@ -49,7 +49,7 @@
         value: argsResults[idx].value ? parseEther(String(argsResults[idx].value)) : 0n,
         chain,
       })) as WriteContractReturnType
-      const transaction = await publicClient.waitForTransactionReceipt({ hash })
+      const transaction = await publicClient.waitForTransactionReceipt({ hash, timeout: 60000 })
       argsResults[idx].result = transaction
     } catch (e) {
       if (e instanceof Error) {

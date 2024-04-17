@@ -122,7 +122,7 @@
         args: [facetCuts, initAddress ?? zeroAddress, initCallData ?? '0x'],
         chain,
       })) as WriteContractReturnType
-      await publicClient.waitForTransactionReceipt({ hash })
+      await publicClient.waitForTransactionReceipt({ hash, timeout: 60000 })
       toast.success('Diamond upgraded successfully')
       await goto(
         `/diamond/${$page.params.address}?network=${
