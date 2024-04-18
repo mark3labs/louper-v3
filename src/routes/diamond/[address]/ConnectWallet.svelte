@@ -34,10 +34,10 @@
         await $web3Modal.open()
       }
       if ($connected && $chainId !== chain.id) {
-        if (isSafeApp) {
-          isUsingSafe.set(true)
-        }
         await switchChain($wagmiConfig, { chainId: chain.id })
+      }
+      if (isSafeApp) {
+        isUsingSafe.set(true)
       }
     } catch (e) {
       console.error(e)
