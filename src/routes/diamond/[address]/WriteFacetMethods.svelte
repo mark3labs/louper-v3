@@ -36,6 +36,7 @@
   }
 
   const writeContract = async (idx: number) => {
+    console.log('Using SAFE:', $isUsingSafe)
     try {
       argsResults[idx].error = undefined
       busy = true
