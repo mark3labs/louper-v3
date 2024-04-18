@@ -22,6 +22,7 @@ export const configuredConnectors = writable<Connector[]>([])
 export const loading = writable<boolean>(true)
 export const web3Modal = writable<Web3Modal>()
 export const wagmiConfig = writable<Config>()
+export const isUsingSafe = writable<boolean>(false)
 
 type DefaultConfigProps = {
   chains: readonly [Chain]

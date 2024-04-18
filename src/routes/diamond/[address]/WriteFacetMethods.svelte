@@ -6,17 +6,18 @@
   import { Label } from '$lib/components/ui/label'
   import * as Select from '$lib/components/ui/select'
   import * as Table from '$lib/components/ui/table'
-  import { connected, wagmiConfig } from '$lib/stores/wagmi'
+  import { connected, wagmiConfig, isUsingSafe } from '$lib/stores/wagmi'
   import type { ArgsResult, Diamond, FacetSelection } from '$lib/types'
-  import { abiMethods, copyToClipboard } from '$lib/utils'
+  import { abiMethods, copyToClipboard, sleep } from '$lib/utils'
   import { getWalletClient, waitForTransactionReceipt } from '@wagmi/core'
   import type { AbiFunction } from 'abitype'
   import { CaretSort, Copy, SketchLogo } from 'radix-icons-svelte'
   import { getContext } from 'svelte'
   import Tags from 'svelte-tags-input'
-  import { parseEther, toFunctionSelector, type WriteContractReturnType } from 'viem'
+  import { parseEther, toFunctionSelector, type Hash, type WriteContractReturnType } from 'viem'
   import type { Chain } from 'viem/chains'
   import ConnectWallet from './ConnectWallet.svelte'
+  import SafeAppsSDK, { TransactionStatus } from '@safe-global/safe-apps-sdk'
 
   const diamond = getContext<Diamond>('diamond')
   const chain = getContext<Chain>('chain')
@@ -47,7 +48,31 @@
         value: argsResults[idx].value ? parseEther(String(argsResults[idx].value)) : 0n,
         chain,
       })) as WriteContractReturnType
-      const transaction = await waitForTransactionReceipt($wagmiConfig, { hash, timeout: 60000 })
+
+      let transaction
+      if (!$isUsingSafe) {
+        /** The usual case, outside of a Safe environment */
+        transaction = await waitForTransactionReceipt($wagmiConfig, { hash, timeout: 60000 })
+      } else {
+        /** The hash will be a safeHash, which needs to be resolved to an on chain one */
+        const sdk = new SafeAppsSDK()
+        while (!transaction) {
+          /** The SDK will be pinged until a txHash is available and the txStatus is in an end-state */
+          const queued = await sdk.txs.getBySafeTxHash(hash)
+          if (
+            queued.txStatus === TransactionStatus.AWAITING_CONFIRMATIONS ||
+            queued.txStatus === TransactionStatus.AWAITING_EXECUTION
+          ) {
+            /** Mimic a status watcher by checking once every 5 seconds */
+            await sleep(5000)
+          } else {
+            /** The txStatus is in an end-state (e.g. success) so we probably have a valid, on chain txHash*/
+            transaction = await waitForTransactionReceipt($wagmiConfig, {
+              hash: queued.txHash as Hash,
+            })
+          }
+        }
+      }
       argsResults[idx].result = transaction
     } catch (e) {
       if (e instanceof Error) {

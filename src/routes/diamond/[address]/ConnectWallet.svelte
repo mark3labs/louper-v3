@@ -11,6 +11,7 @@
     signerAddress,
     web3Modal,
     wagmiConfig,
+    isUsingSafe,
   } from '$lib/stores/wagmi'
   import { connect } from '@wagmi/core'
   import type { Chain } from 'viem/chains'
@@ -33,6 +34,9 @@
         await $web3Modal.open()
       }
       if ($connected && $chainId !== chain.id) {
+        if (isSafeApp) {
+          isUsingSafe.set(true)
+        }
         await switchChain($wagmiConfig, { chainId: chain.id })
       }
     } catch (e) {
@@ -44,6 +48,7 @@
   }
 
   const disconnectWallet = async () => {
+    isUsingSafe.set(false)
     await disconnectWagmi()
   }
 

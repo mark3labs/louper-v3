@@ -146,3 +146,5 @@ export const getFuncSigBySelector = async (selector: string): Promise<string> =>
 
 export const abiMethods = (abi: Abi): AbiFunction[] =>
   abi.filter((i) => i.type === 'function') as AbiFunction[]
+
+export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
