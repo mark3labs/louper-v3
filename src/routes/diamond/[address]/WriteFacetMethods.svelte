@@ -57,9 +57,12 @@
       } else {
         /** The hash will be a safeHash, which needs to be resolved to an on chain one */
         const sdk = new SafeAppsSDK()
-        while (!transaction) {
+        let waiting = true
+        while (waiting) {
           /** The SDK will be pinged until a txHash is available and the txStatus is in an end-state */
+          console.log('Checking tx status...')
           const queued = await sdk.txs.getBySafeTxHash(hash)
+          console.log('Queued:', queued)
           if (
             queued.txStatus === TransactionStatus.AWAITING_CONFIRMATIONS ||
             queued.txStatus === TransactionStatus.AWAITING_EXECUTION
@@ -71,10 +74,11 @@
             transaction = await waitForTransactionReceipt($wagmiConfig, {
               hash: queued.txHash as Hash,
             })
+            waiting = false
           }
         }
       }
-      argsResults[idx].result = transaction
+      argsResults[idx].result = transaction ?? 'Transaction status unknown'
     } catch (e) {
       if (e instanceof Error) {
         argsResults[idx].error = e.toString()
