@@ -12,6 +12,9 @@ for (const [k, v] of Object.entries(chains)) {
   if (k.includes('wanchain')) continue
   if (k === 'saigon') continue
   if (k.includes('skale')) continue
+  if (k === 'zkSyncInMemoryNode') continue
+  if (k === 'zkSyncLocalNode') continue
+  if (k === 'lineaTestnet') continue
   chainMap[k] = v
   allChains.push(v)
 }

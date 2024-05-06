@@ -52,6 +52,6 @@
     "svelte-tags-input": "^5.0.0",
     "tailwind-merge": "^1.14.0",
     "tailwind-variants": "^0.1.14",
-    "viem": "2.9.19"
+    "viem": "2.9.32"
   }
 }
