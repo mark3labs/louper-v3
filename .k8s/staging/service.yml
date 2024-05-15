@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: louper-staging-service
+spec:
+  type: NodePort
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 31943
+      protocol: TCP
+  selector:
+    app: louper-staging
