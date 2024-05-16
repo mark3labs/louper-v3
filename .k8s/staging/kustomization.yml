@@ -18,3 +18,5 @@ patches:
 
 namespace: louper-staging
 nameSuffix: -staging
+commonLabels:
+  app: louper-staging

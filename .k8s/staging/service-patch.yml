@@ -15,6 +15,3 @@
 - op: replace
   path: /spec/ports/0/nodePort
   value: 31943
-- op: replace
-  path: /spec/selector/app
-  value: louper-staging
