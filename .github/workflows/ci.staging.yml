@@ -1,9 +1,10 @@
 name: build-and-deploy-staging
 
 on:
-  push:
+  workflow_dispatch:
     branches:
       - dev
+
 run-name: build-and-deploy-staging:${{github.event.client_payload.id}}
 jobs:
   docker:
