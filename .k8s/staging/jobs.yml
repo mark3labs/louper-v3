@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   namespace: louper-staging
-  name: github-ci-staging
+  name: github-ci
   generatedName: build-image-and-push-
   annotations:
     argocd.argoproj.io/hook: PreSync
@@ -11,7 +11,7 @@ spec:
   template:
     spec:
       containers:
-        - name: github-ci-staging
+        - name: github-ci
           image: pkgxdev/pkgx:latest
           imagePullPolicy: Always
           env:
