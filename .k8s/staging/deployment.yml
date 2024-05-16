@@ -74,8 +74,12 @@ spec:
               gh auth login
               export JOB_ID=$(uuidgen)
               echo "{\"job_id\": \"$JOB_ID\" }" | gh workflow run build-and-deploy-staging --repo mark3labs/louper-v3 --ref dev --json
-              STATUS=$(gh run list --workflow=build-and-deploy-staging --repo mark3labs/louper-v3 --json "status,name" | jq '.[] | select(.name == "build-and-deploy-staging:$JOB_ID")' | jq '.status')
-              echo $STATUS
+              STATUS="starting"
+              while [[ "$STATUS" != "completed" && "$STATUS" != "failure" ]]
+              do
+                STATUS=$(gh run list --workflow=build-and-deploy-staging --repo mark3labs/louper-v3 --json "status,name" | jq '.[] | select(.name == "build-and-deploy-staging:$JOB_ID")' | jq '.status')
+                sleep 1
+              done
 
           resources:
             limits:
