@@ -54,30 +54,28 @@ spec:
   template:
     spec:
       containers:
-        - name: kaniko
-          args:
-            - --context=git://github.com/mark3labs/louper-v3/#refs/heads/dev
-            - --dockerfile=Dockerfile
-            - --destination=mark3labs/louper-web:staging
-            - --cache=true
-            - --use-new-run
-            - --single-snapshot
-            - --compressed-caching=false
-          image: gcr.io/kaniko-project/executor:latest
+        - name: gh
+          image: pkgxdev/pkgx:latest
           imagePullPolicy: Always
-          volumeMounts:
-            - mountPath: /kaniko/.docker
-              name: docker-config
-              readOnly: true
+          env:
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: gh
+                  key: token
+          command:
+            - /bin/sh
+            - -c
+            - |
+              pkgx install gh
+              gh auth
+              export JOB_ID=$(pkgx uuidgen)
+              echo '{"job_id": $JOB_ID }' | gh workflow run build-and-deploy-staging --repo mark3labs/louper-v3 --ref dev
+              STATUS=(gh run list --workflow=ci.staging.yml --json "status,name" | jq '.[] | select(.name == "build-and-deploy-staging:$JOB_ID")' | jq '.status')
+              echo $STATUS
+
           resources:
             limits:
               cpu: 1
               memory: 1Gi
       restartPolicy: Never
-      volumes:
-        - name: docker-config
-          secret:
-            secretName: regcred
-            items:
-              - key: .dockerconfigjson
-                path: config.json
