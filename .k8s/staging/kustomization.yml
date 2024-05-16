@@ -17,3 +17,4 @@ patches:
     path: service-patch.yml
 
 namespace: louper-staging
+nameSuffix: -staging
