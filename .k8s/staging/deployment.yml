@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: louper-container-staging
-          image: mark3labs/louper-web:staging
+          image: mark3labs/louper-web:staging-latest
           volumeMounts:
             - mountPath: '/app/data'
               name: volume
