@@ -67,6 +67,7 @@ spec:
             - /bin/sh
             - -c
             - |
+              apt update && apt install -y ca-certificates
               pkgx install gh
               pkgx install jq
               pkgx install uuidgen
