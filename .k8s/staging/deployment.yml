@@ -77,7 +77,7 @@ spec:
               STATUS="starting"
               while [[ "$STATUS" != "completed" && "$STATUS" != "failure" ]]
               do
-                STATUS=$(gh run list --workflow=build-and-deploy-staging --repo mark3labs/louper-v3 --json "status,name" | jq --arg i "build-and-deploy-staging:$JOB_ID" '.[] | select(.name == $i)' | jq '.status')
+                STATUS=$(gh run list --workflow=build-and-deploy-staging --repo mark3labs/louper-v3 --json "status,name" | jq --arg i "build-and-deploy-staging:$JOB_ID" '.[] | select(.name == $i)' | jq -r '.status')
                 echo "Job Status: $STATUS"
                 sleep 1
               done
