@@ -39,5 +39,5 @@
 #     requests:
 #       storage: 1Gi
 - op: replace
-  path: /spec/template/spec/containers/image
+  path: /spec/template/spec/containers/0/image
   value: mark3labs/louper-web:staging-latest
