@@ -2,10 +2,14 @@ name: build-and-deploy-staging
 
 on:
   workflow_dispatch:
+    inputs:
+      job_id:
+        description: 'The unique ID for tracking'
+        required: true
     branches:
       - dev
 
-run-name: build-and-deploy-staging:${{github.event.client_payload.id}}
+run-name: build-and-deploy-staging:${{github.event.client_payload.job_id}}
 jobs:
   docker:
     runs-on: ubuntu-latest
