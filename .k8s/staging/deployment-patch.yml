@@ -1,0 +1,43 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: louper-deployment
+#   namespace: louper
+#   labels:
+#     app: louper
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: louper
+#   template:
+#     metadata:
+#       labels:
+#         app: louper
+#     spec:
+#       containers:
+#         - name: louper-container-staging
+#           image: mark3labs/louper-web:latest
+#           volumeMounts:
+#             - mountPath: '/app/data'
+#               name: volume
+#           imagePullPolicy: Always
+#       volumes:
+#         - name: volume
+#           persistentVolumeClaim:
+#             claimName: louper-db
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   namespace: louper
+#   name: louper-db
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 1Gi
+- op: replace
+  path: /spec/template/spec/containers/image
+  value: mark3labs/louper-web:staging-latest

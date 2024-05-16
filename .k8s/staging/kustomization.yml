@@ -4,8 +4,16 @@ kind: Kustomization
 resources:
   - ../base
   - namespace.yml
+  - application.yml
+  - jobs.yml
 patches:
-  - path: deployment.yml
-  - path: application.yml
-  - path: service.yml
+  - target:
+      kind: Deployment
+      name: louper-deployment
+    path: deployment-patch.yml
+  - target:
+      kind: Service
+      name: louper-service
+    path: service-patch.yml
+
 namespace: louper-staging
