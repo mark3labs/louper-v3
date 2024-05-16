@@ -9,16 +9,16 @@ metadata:
   name: louper-deployment
   namespace: louper-staging
   labels:
-    app: louper-staging
+    app: louper
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: louper-staging
+      app: louper
   template:
     metadata:
       labels:
-        app: louper-staging
+        app: louper
     spec:
       containers:
         - name: louper-container-staging
