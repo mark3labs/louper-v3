@@ -14,7 +14,7 @@
 #     app: louper
 - op: replace
   path: /spec/ports/0/nodePort
-  vvalue: 31943
+  value: 31943
 - op: replace
   path: /spec/selector/app
-  vvalue: louper-staging
+  value: louper-staging
