@@ -9,7 +9,7 @@ on:
     branches:
       - dev
 
-run-name: build-and-deploy-staging:${{github.event.client_payload.job_id}}
+run-name: build-and-deploy-staging:${{ inputs.job_id }}
 jobs:
   docker:
     runs-on: ubuntu-latest
