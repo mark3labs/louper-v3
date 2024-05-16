@@ -1,10 +1,15 @@
 name: build-and-deploy-prod
 
 on:
-  push:
+  workflow_dispatch:
+    inputs:
+      job_id:
+        description: 'The unique ID for tracking'
+        required: true
     branches:
       - master
 
+run-name: build-and-deploy-prod:${{ inputs.job_id }}
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -30,17 +35,3 @@ jobs:
           tags: |
             mark3labs/louper-web:${{ steps.vars.outputs.version }}
             mark3labs/louper-web:latest
-
-      - name: Install doctl
-        uses: digitalocean/action-doctl@v2
-        with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-
-      - name: Save DigitalOcean kubeconfig with short-lived credentials
-        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 662138bb-8236-4da5-8c6d-c602fb6eef82
-
-      - name: Deploy to DigitalOcean Kubernetes
-        run: kubectl rollout restart deployment/louper
-
-      - name: Verify deployment
-        run: kubectl rollout status deployment/louper
