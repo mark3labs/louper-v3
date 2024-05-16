@@ -4,7 +4,8 @@ metadata:
   name: louper-staging
   namespace: argocd
   annotations:
-    argocd-image-updater.argoproj.io/image-list: mark3labs/louper-web:staging-latest
+    argocd-image-updater.argoproj.io/image-list: louper=mark3labs/louper-web:staging-latest
+    argocd-image-updater.argoproj.io/louper.update-strategy: digest
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
@@ -16,3 +17,7 @@ spec:
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: louper-staging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
