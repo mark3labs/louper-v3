@@ -6,7 +6,7 @@ metadata:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: louper-staging
+  name: louper-deployment
   namespace: louper-staging
   labels:
     app: louper-staging
@@ -35,7 +35,8 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: louper-staging-db
+  namespace: louper-staging
+  name: louper-db
 spec:
   accessModes:
     - ReadWriteOnce
@@ -46,6 +47,8 @@ spec:
 apiVersion: batch/v1
 kind: Job
 metadata:
+  namespace: louper-staging
+  name: github-ci
   generatedName: build-image-and-push-
   annotations:
     argocd.argoproj.io/hook: PreSync
@@ -54,7 +57,7 @@ spec:
   template:
     spec:
       containers:
-        - name: gh
+        - name: github-ci
           image: pkgxdev/pkgx:latest
           imagePullPolicy: Always
           env:
