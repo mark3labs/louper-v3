@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: louper
-  namespace: argocd
+  namespace: louper
   annotations:
     argocd-image-updater.argoproj.io/image-list: louper=mark3labs/louper-web:latest
     argocd-image-updater.argoproj.io/louper.update-strategy: digest
