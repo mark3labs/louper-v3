@@ -64,7 +64,7 @@ spec:
                   name: gh
                   key: token
           command:
-            - /bin/sh
+            - /bin/bash
             - -c
             - |
               apt update && apt install -y ca-certificates
@@ -78,6 +78,7 @@ spec:
               while [[ "$STATUS" != "completed" && "$STATUS" != "failure" ]]
               do
                 STATUS=$(gh run list --workflow=build-and-deploy-staging --repo mark3labs/louper-v3 --json "status,name" | jq '.[] | select(.name == "build-and-deploy-staging:$JOB_ID")' | jq '.status')
+                echo "Job Status: $STATUS"
                 sleep 1
               done
 
