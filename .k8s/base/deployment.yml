@@ -1,7 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: louper
+  name: louper-deployment
+  namespace: louper
   labels:
     app: louper
 spec:
@@ -15,7 +16,7 @@ spec:
         app: louper
     spec:
       containers:
-        - name: louper-container
+        - name: louper-container-staging
           image: mark3labs/louper-web:latest
           volumeMounts:
             - mountPath: '/app/data'
@@ -29,6 +30,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  namespace: louper
   name: louper-db
 spec:
   accessModes:
