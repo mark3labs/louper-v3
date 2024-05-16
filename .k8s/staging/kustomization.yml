@@ -1,5 +1,7 @@
 resources:
-  - ../
+  - ../application.yml
+  - ../deployment.yml
+  - ../service.yml
 patches:
   - path: deployment.yml
   - path: application.yml
