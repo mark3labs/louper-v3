@@ -1,0 +1,7 @@
+bases:
+  - ../
+patches:
+  - path: deployment.yml
+  - path: application.yml
+  - path: service.yml
+namespace: louper-staging

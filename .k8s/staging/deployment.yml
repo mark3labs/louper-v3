@@ -7,86 +7,36 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: louper-deployment
-  namespace: louper-staging
-  labels:
-    app: louper
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: louper
   template:
-    metadata:
-      labels:
-        app: louper
     spec:
       containers:
         - name: louper-container-staging
           image: mark3labs/louper-web:staging-latest
-          volumeMounts:
-            - mountPath: '/app/data'
-              name: volume
-          imagePullPolicy: Always
-      volumes:
-        - name: volume
-          persistentVolumeClaim:
-            claimName: louper-db
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  namespace: louper-staging
-  name: louper-db
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  namespace: louper-staging
   name: github-ci
-  generatedName: build-image-and-push-
-  annotations:
-    argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
   template:
     spec:
       containers:
-        - name: github-ci
-          image: pkgxdev/pkgx:latest
-          imagePullPolicy: Always
-          env:
-            - name: GITHUB_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: gh
-                  key: token
-          command:
-            - /bin/bash
-            - -c
-            - |
-              apt update && apt install -y ca-certificates
-              pkgx install gh
-              pkgx install jq
-              pkgx install uuidgen
-              gh auth login
-              export JOB_ID=$(uuidgen)
-              echo "{\"job_id\": \"$JOB_ID\" }" | gh workflow run build-and-deploy-staging --repo mark3labs/louper-v3 --ref dev --json
-              STATUS="starting"
-              while [[ "$STATUS" != "completed" && "$STATUS" != "failure" ]]
-              do
-                STATUS=$(gh run list --workflow=build-and-deploy-staging --repo mark3labs/louper-v3 --json "status,name" | jq --arg i "build-and-deploy-staging:$JOB_ID" '.[] | select(.name == $i)' | jq -r '.status')
-                echo "Job Status: $STATUS"
-                sleep 1
-              done
-
-          resources:
-            limits:
-              cpu: 1
-              memory: 1Gi
-      restartPolicy: Never
+        command:
+          - /bin/bash
+          - -c
+          - |
+            apt update && apt install -y ca-certificates
+            pkgx install gh
+            pkgx install jq
+            pkgx install uuidgen
+            gh auth login
+            export JOB_ID=$(uuidgen)
+            echo "{\"job_id\": \"$JOB_ID\" }" | gh workflow run build-and-deploy-staging --repo mark3labs/louper-v3 --ref dev --json
+            STATUS="starting"
+            while [[ "$STATUS" != "completed" && "$STATUS" != "failure" ]]
+            do
+              STATUS=$(gh run list --workflow=build-and-deploy-staging --repo mark3labs/louper-v3 --json "status,name" | jq --arg i "build-and-deploy-staging:$JOB_ID" '.[] | select(.name == $i)' | jq -r '.status')
+              echo "Job Status: $STATUS"
+              sleep 1
+            done
