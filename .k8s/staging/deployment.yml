@@ -30,7 +30,7 @@ spec:
       volumes:
         - name: volume
           persistentVolumeClaim:
-            claimName: louper-staging-db
+            claimName: louper-db
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
