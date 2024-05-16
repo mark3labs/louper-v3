@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "svelte-kit sync && vite build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
@@ -18,7 +18,7 @@
     "@typescript-eslint/parser": "^5.45.0",
     "autoprefixer": "^10.4.14",
     "bun-types": "^1.0.7",
-    "drizzle-kit": "^0.20.13",
+    "drizzle-kit": "0.21.2",
     "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-svelte": "^2.30.0",
@@ -52,6 +52,11 @@
     "svelte-tags-input": "^5.0.0",
     "tailwind-merge": "^1.14.0",
     "tailwind-variants": "^0.1.14",
-    "viem": "2.9.19"
-  }
+    "viem": "2.10.5"
+  },
+  "trustedDependencies": [
+    "@sveltejs/kit",
+    "svelte-preprocess",
+    "utf-8-validate"
+  ]
 }

@@ -1,4 +1,4 @@
-name: Docker
+name: build-and-deploy-prod
 
 on:
   push:
