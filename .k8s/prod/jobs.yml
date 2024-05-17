@@ -1,7 +1,6 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  namespace: louper
   name: github-ci
   generatedName: build-image-and-push-
   annotations:

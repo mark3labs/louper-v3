@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: louper-deployment
-  namespace: louper
   labels:
     app: louper
 spec:
@@ -30,7 +29,6 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  namespace: louper
   name: louper-db
 spec:
   accessModes:
