@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: louper
-  namespace: louper
+  namespace: argocd
   annotations:
     argocd-image-updater.argoproj.io/image-list: louper=mark3labs/louper-web:latest
     argocd-image-updater.argoproj.io/louper.update-strategy: digest
@@ -16,7 +16,6 @@ spec:
     targetRevision: master
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: louper
   syncPolicy:
     automated:
       prune: true
