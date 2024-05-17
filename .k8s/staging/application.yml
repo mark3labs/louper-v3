@@ -16,7 +16,6 @@ spec:
     targetRevision: dev
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: louper-staging
   syncPolicy:
     automated:
       prune: true
