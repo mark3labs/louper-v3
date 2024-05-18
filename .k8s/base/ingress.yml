@@ -11,7 +11,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: louper
+                name: louper-service
                 port:
                   number: 3000
   ingressClassName: nginx
