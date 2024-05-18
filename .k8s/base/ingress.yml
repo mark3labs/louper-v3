@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: louper-ingress
+spec:
+  rules:
+    - host: louper.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: louper
+                port:
+                  number: 3000
+  ingressClassName: nginx

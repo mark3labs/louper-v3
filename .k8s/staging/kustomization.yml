@@ -11,6 +11,10 @@ patches:
       kind: Deployment
       name: louper-deployment
     path: deployment-patch.yml
+  - target:
+      kind: Ingress
+      name: louper-ingress
+    path: ingress-patch.yml
 transformers:
   - |-
     apiVersion: builtin
