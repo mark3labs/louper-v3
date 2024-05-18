@@ -28,7 +28,7 @@
   path: /spec/rules/0/http/paths/0/backend/service/name
   value: louper-service-staging
 - op: replace
-  path: '/metadata/annotation/cert-manager.io~1issuer'
+  path: '/metadata/annotations/cert-manager.io~1issuer'
   value: letsencrypt-louper-staging
 - op: replace
   path: /spec/tls/0/hosts/0
