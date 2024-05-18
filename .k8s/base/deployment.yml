@@ -17,6 +17,9 @@ spec:
       containers:
         - name: louper-container
           image: mark3labs/louper-web:latest
+          ports:
+            - name: http
+              containerPort: 3000
           volumeMounts:
             - mountPath: '/app/data'
               name: volume

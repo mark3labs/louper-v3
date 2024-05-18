@@ -3,11 +3,11 @@ kind: Service
 metadata:
   name: louper-service
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
-    - port: 3000
+    - name: http
+      port: 80
       targetPort: 3000
-      nodePort: 31942
       protocol: TCP
   selector:
     app: louper
