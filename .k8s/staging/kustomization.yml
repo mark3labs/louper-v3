@@ -11,10 +11,6 @@ patches:
       kind: Deployment
       name: louper-deployment
     path: deployment-patch.yml
-  - target:
-      kind: Service
-      name: louper-service
-    path: service-patch.yml
 transformers:
   - |-
     apiVersion: builtin
