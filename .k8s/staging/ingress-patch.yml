@@ -2,7 +2,13 @@
 # kind: Ingress
 # metadata:
 #   name: louper-ingress
+#   annotations:
+#     cert-manager.io/issuer: letsencrypt-louper
 # spec:
+#   tls:
+#     - hosts:
+#       - louper.dev
+#       secretName: letsencrypt-louper
 #   rules:
 #     - host: louper.dev
 #       http:
@@ -11,7 +17,7 @@
 #             pathType: Prefix
 #             backend:
 #               service:
-#                 name: louper
+#                 name: louper-service
 #                 port:
 #                   number: 3000
 #   ingressClassName: nginx
@@ -21,3 +27,9 @@
 - op: replace
   path: /spec/rules/0/http/paths/0/backend/service/name
   value: louper-service-staging
+- op: replace
+  path: '/metadata/annotation/cert-manager.io~1issuer'
+  value: letsencrypt-louper-staging
+- op: replace
+  path: /spec/tls/0/hosts/0
+  value: staging.louper.dev

@@ -5,3 +5,4 @@ resources:
   - deployment.yml
   - service.yml
   - ingress.yml
+  - cert-manager-issuer.yml
