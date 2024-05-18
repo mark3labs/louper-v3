@@ -4,6 +4,7 @@ metadata:
   name: louper-ingress
   annotations:
     cert-manager.io/issuer: letsencrypt-louper
+    nginx.ingress.kubernetes.io/enable-cors: 'true'
 spec:
   tls:
     - hosts:
