@@ -1,15 +1,9 @@
 name: build-and-deploy-prod
 
 on:
-  workflow_dispatch:
-    inputs:
-      job_id:
-        description: 'The unique ID for tracking'
-        required: true
+  push:
     branches:
       - master
-
-run-name: build-and-deploy-prod:${{ inputs.job_id }}
 jobs:
   docker:
     runs-on: ubuntu-latest
