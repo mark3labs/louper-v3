@@ -106,7 +106,7 @@ bun ./scripts/migrate.ts
 5. Start the dev server
 
 ```sh
-bun --bun --hot-dev
+bun --bun --hot dev
 ```
 
 ## Usage
