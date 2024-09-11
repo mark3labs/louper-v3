@@ -69,7 +69,10 @@ export const getContractInformation = async (
 ): Promise<Contract> => {
   try {
     const response = await fetch(`https://anyabi.xyz/api/get-abi/${chainId}/${address}`)
-    if (!response.ok) return { name: 'Unverified', address, abi: [] }
+    if (!response.ok) {
+      consola.info('ABI not found.')
+      return { name: 'Unverified', address, abi: [] }
+    }
     const contractData = await response.json()
 
     return {
@@ -78,7 +81,8 @@ export const getContractInformation = async (
     }
   } catch (e) {
     consola.error(e)
-    throw new Error('Contract not found')
+    consola.info('ABI not found.')
+    return { name: 'Unverified', address, abi: [] }
   }
 }
 
@@ -89,6 +93,7 @@ export const getCachedContractInformation = async (
 ): Promise<Contract> => {
   try {
     consola.info('Fetching contract information for', address, 'on chain', chainId)
+    consola.info('Checking for cached ABI...')
     const result = await db
       .select()
       .from(contracts)
@@ -102,6 +107,7 @@ export const getCachedContractInformation = async (
         address,
       }
     }
+    consola.info('Not found in cache. Fetching from anyabi.xyz...')
     const contract = await getContractInformation(address, chainId)
 
     // Don't cache unverified contracts
@@ -110,7 +116,7 @@ export const getCachedContractInformation = async (
     }
 
     // Update the database
-    consola.info('Updating db cache')
+    consola.info('Updating db cache...')
     await db.insert(contracts).values({
       id: `${chainId}:${address}`,
       name: contract.name,
@@ -122,7 +128,7 @@ export const getCachedContractInformation = async (
     return contract
   } catch (e) {
     consola.error(e)
-    throw new Error('Contract not found')
+    throw new Error('Failed to fetch contract information')
   }
 }
 
