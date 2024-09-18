@@ -71,12 +71,15 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
           visits: sql`${diamonds.visits} + 1`,
         },
       })
+    consola.info('Stats updated.')
 
-    return json({
+    const response = {
       chain: network,
       diamond,
       diamondAbi,
-    })
+    }
+
+    return json(response)
   } catch (e) {
     console.error(e)
     throw error(400, { message: 'Unable to fetch diamond details' })
