@@ -1,9 +1,5 @@
 import type { FacetData, Contract, Diamond } from '$lib/types'
-import {
-  getCachedContractInformation,
-  getContractInformation,
-  getFuncSigBySelector,
-} from '$lib/utils'
+import { getCachedContractInformation, getFuncSigBySelector } from '$lib/utils.server'
 import { error, json } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
 import {
