@@ -3,12 +3,8 @@ import { twMerge } from 'tailwind-merge'
 import { cubicOut } from 'svelte/easing'
 import type { TransitionConfig } from 'svelte/transition'
 import { type Abi, type AbiFunction, type Address } from 'viem'
-import type { Contract } from './types'
 import toast from 'svelte-french-toast'
-import Database from 'bun:sqlite'
-import { drizzle, type BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite'
-import { contracts } from '../schema'
-import { and, eq } from 'drizzle-orm'
+import type { Contract } from './types'
 import consola from 'consola'
 
 export function cn(...inputs: ClassValue[]) {
@@ -63,13 +59,26 @@ export const flyAndScale = (
   }
 }
 
+export const copyToClipboard = async (text: string) => {
+  await navigator.clipboard.writeText(text)
+  toast.success('Copied to clipboard!')
+}
+
+export const abiMethods = (abi: Abi): AbiFunction[] =>
+  abi.filter((i) => i.type === 'function') as AbiFunction[]
+
+export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
 export const getContractInformation = async (
   address: Address,
   chainId: number,
 ): Promise<Contract> => {
   try {
     const response = await fetch(`https://anyabi.xyz/api/get-abi/${chainId}/${address}`)
-    if (!response.ok) return { name: 'Unverified', address, abi: [] }
+    if (!response.ok) {
+      consola.info('ABI not found.')
+      return { name: 'Unverified', address, abi: [] }
+    }
     const contractData = await response.json()
 
     return {
@@ -78,73 +87,7 @@ export const getContractInformation = async (
     }
   } catch (e) {
     consola.error(e)
-    throw new Error('Contract not found')
+    consola.info('ABI not found.')
+    return { name: 'Unverified', address, abi: [] }
   }
 }
-
-export const getCachedContractInformation = async (
-  address: Address,
-  chainId: number,
-  db: BunSQLiteDatabase,
-): Promise<Contract> => {
-  try {
-    consola.info('Fetching contract information for', address, 'on chain', chainId)
-    const result = await db
-      .select()
-      .from(contracts)
-      .where(and(eq(contracts.address, address), eq(contracts.chainId, chainId)))
-
-    if (result.length) {
-      consola.info('Found in db cache')
-      return {
-        name: result[0].name,
-        abi: [...JSON.parse(result[0].abi)],
-        address,
-      }
-    }
-    const contract = await getContractInformation(address, chainId)
-
-    // Don't cache unverified contracts
-    if (contract.name === 'Unverified') {
-      return contract
-    }
-
-    // Update the database
-    consola.info('Updating db cache')
-    await db.insert(contracts).values({
-      id: `${chainId}:${address}`,
-      name: contract.name,
-      address,
-      abi: JSON.stringify(contract.abi),
-      chainId,
-    })
-
-    return contract
-  } catch (e) {
-    consola.error(e)
-    throw new Error('Contract not found')
-  }
-}
-
-export const copyToClipboard = async (text: string) => {
-  await navigator.clipboard.writeText(text)
-  toast.success('Copied to clipboard!')
-}
-
-export const getFuncSigBySelector = async (selector: string): Promise<string> => {
-  const response = await fetch(
-    `https://api.openchain.xyz/signature-database/v1/lookup?function=${selector}&filter=true`,
-  )
-  const data = await response.json()
-
-  if (data && data.result && data.result.function && data.result.function[selector]) {
-    return data.result.function[selector][0].name
-  }
-
-  return 'unknown()'
-}
-
-export const abiMethods = (abi: Abi): AbiFunction[] =>
-  abi.filter((i) => i.type === 'function') as AbiFunction[]
-
-export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))

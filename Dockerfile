@@ -1,4 +1,4 @@
-FROM oven/bun:1.1-slim
+FROM oven/bun:1.1.20-slim
 
 WORKDIR /app
 COPY package.json package.json

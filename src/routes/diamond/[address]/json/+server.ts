@@ -1,9 +1,5 @@
 import type { FacetData, Contract, Diamond } from '$lib/types'
-import {
-  getCachedContractInformation,
-  getContractInformation,
-  getFuncSigBySelector,
-} from '$lib/utils'
+import { getCachedContractInformation, getFuncSigBySelector } from '$lib/utils.server'
 import { error, json } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
 import {
@@ -17,10 +13,10 @@ import {
 } from 'viem'
 import type { Chain } from 'viem/chains'
 import { chainMap } from '$lib/chains'
-import { drizzle, type BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite'
-import { Database } from 'bun:sqlite'
+import { type BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite'
 import { diamonds } from '../../../../schema'
 import { sql } from 'drizzle-orm'
+import consola from 'consola'
 
 export const GET: RequestHandler = async ({ params, url, locals }) => {
   const { address } = params
@@ -59,9 +55,8 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
     }
 
     // Udate the database
-    const sqlite = new Database('./data/louper.db')
-    const db = drizzle(sqlite)
-    await db
+    consola.info('Updating stats...')
+    await locals.db
       .insert(diamonds)
       .values({
         id: `${network}:${address}`,
@@ -76,14 +71,15 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
           visits: sql`${diamonds.visits} + 1`,
         },
       })
+    consola.info('Stats updated.')
 
-    sqlite.close()
-
-    return json({
+    const response = {
       chain: network,
       diamond,
       diamondAbi,
-    })
+    }
+
+    return json(response)
   } catch (e) {
     console.error(e)
     throw error(400, { message: 'Unable to fetch diamond details' })

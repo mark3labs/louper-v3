@@ -1,5 +1,5 @@
 import type { FacetData, Contract, Diamond } from '$lib/types'
-import { getCachedContractInformation, getFuncSigBySelector } from '$lib/utils'
+import { getCachedContractInformation, getFuncSigBySelector } from '$lib/utils.server'
 import { error } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
 import {
@@ -16,6 +16,7 @@ import { chainMap } from '$lib/chains'
 import { type BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite'
 import { diamonds } from '../../../schema'
 import { sql } from 'drizzle-orm'
+import consola from 'consola'
 
 export const load: PageServerLoad = async ({ params, url, locals }) => {
   const { address } = params
@@ -54,6 +55,7 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
     }
 
     // Udate the database
+    consola.info('Updating stats...')
     await locals.db
       .insert(diamonds)
       .values({
