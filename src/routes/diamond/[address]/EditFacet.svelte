@@ -22,6 +22,8 @@
     parseAbi,
     zeroAddress,
     type WriteContractReturnType,
+    type AbiItem,
+    type AbiFunction,
   } from 'viem'
   import type { Chain } from 'viem/chains'
   import ConnectWallet from './ConnectWallet.svelte'
@@ -263,6 +265,13 @@
       }
     }
   }
+
+  const getFunctionSelector = (m: AbiFunction) => {
+    if (m.name.indexOf('unknown_') > -1) {
+      return m.name.split('_')[1]
+    }
+    return toFunctionSelector(m)
+  }
 </script>
 
 <div class="flex flex-row items-center justify-between p-2 space-x-3">
@@ -364,10 +373,10 @@
                   <Table.Cell class="text-left">
                     <div>
                       <Checkbox
-                        bind:this={checkboxes[f.address.slice(0, 5) + toFunctionSelector(m)]}
+                        bind:this={checkboxes[f.address.slice(0, 5) + getFunctionSelector(m)]}
                         onCheckedChange={updateAdditionsAndReplacements(
                           f.address,
-                          toFunctionSelector(m),
+                          getFunctionSelector(m),
                         )}
                       />
                     </div>
@@ -375,12 +384,12 @@
                   <Table.Cell class="font-medium text-left w-full text-lg">
                     <div
                       class:bg-green-500={strategy.additions[f.address] &&
-                        strategy.additions[f.address].includes(toFunctionSelector(m))}
+                        strategy.additions[f.address].includes(getFunctionSelector(m))}
                       class:bg-yellow-500={strategy.replacements[f.address] &&
-                        strategy.replacements[f.address].includes(toFunctionSelector(m))}
+                        strategy.replacements[f.address].includes(getFunctionSelector(m))}
                       class="flex items-center p-1 rounded-md bg-opacity-90"
                     >
-                      <Badge class="mr-2">{toFunctionSelector(m)}</Badge>
+                      <Badge class="mr-2">{getFunctionSelector(m)}</Badge>
                       {m.name}
                     </div>
                   </Table.Cell>
@@ -423,23 +432,23 @@
                 <Table.Row class="border-none">
                   <Table.Cell class="text-left">
                     <Checkbox
-                      bind:this={checkboxes[f.address.slice(0, 5) + toFunctionSelector(m)]}
-                      onCheckedChange={updateRemovals(f.address, toFunctionSelector(m))}
+                      bind:this={checkboxes[f.address.slice(0, 5) + getFunctionSelector(m)]}
+                      onCheckedChange={updateRemovals(f.address, getFunctionSelector(m))}
                       disabled={Object.values(strategy.replacements).some((r) =>
-                        r.includes(toFunctionSelector(m)),
+                        r.includes(getFunctionSelector(m)),
                       )}
                     />
                   </Table.Cell>
                   <Table.Cell class="font-medium text-left w-full text-lg">
                     <div
                       class:bg-red-500={strategy.removals[f.address] &&
-                        strategy.removals[f.address].includes(toFunctionSelector(m))}
+                        strategy.removals[f.address].includes(getFunctionSelector(m))}
                       class:bg-yellow-500={Object.values(strategy.replacements).some((r) =>
-                        r.includes(toFunctionSelector(m)),
+                        r.includes(getFunctionSelector(m)),
                       )}
                       class="flex items-center p-1 rounded-md bg-opacity-90"
                     >
-                      <Badge class="mr-2">{toFunctionSelector(m)}</Badge>
+                      <Badge class="mr-2">{getFunctionSelector(m)}</Badge>
                       {m.name}
                     </div>
                   </Table.Cell>
