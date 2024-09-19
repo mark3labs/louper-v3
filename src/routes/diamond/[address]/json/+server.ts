@@ -105,6 +105,11 @@ const buildFacet = async (
 
   const fileredAbi: Abi = facet.abi.filter((item) => {
     if (item.type !== 'function') return true
+    if (item.name.indexOf('unknown_') > -1) {
+      if (selectors.includes(item.name.split('_')[1])) {
+        return true
+      }
+    }
     if (!item.outputs) {
       item.outputs = []
     }
