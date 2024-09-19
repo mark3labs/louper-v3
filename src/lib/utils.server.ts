@@ -84,5 +84,5 @@ export const getFuncSigBySelector = async (selector: string): Promise<string> =>
     return data.result.function[selector][0].name
   }
 
-  return 'unknown()'
+  return `unknown_${selector}()`
 }

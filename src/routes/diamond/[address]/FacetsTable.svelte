@@ -70,17 +70,31 @@
                       </code>
                       <Separator orientation="vertical" />
 
-                      <code
-                        class="rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
-                      >
-                        {toFunctionSelector(m)}
-                      </code>
-                      <Button
-                        variant="ghost"
-                        on:click={() => copyToClipboard(toFunctionSelector(m))}
-                      >
-                        <Copy />
-                      </Button>
+                      {#if m.name.indexOf('unknown_') > -1}
+                        <code
+                          class="rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+                        >
+                          {m.name.split('_')[1]}
+                        </code>
+                        <Button
+                          variant="ghost"
+                          on:click={() => copyToClipboard(m.name.split('_')[1])}
+                        >
+                          <Copy />
+                        </Button>
+                      {:else}
+                        <code
+                          class="rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+                        >
+                          {toFunctionSelector(m)}
+                        </code>
+                        <Button
+                          variant="ghost"
+                          on:click={() => copyToClipboard(toFunctionSelector(m))}
+                        >
+                          <Copy />
+                        </Button>
+                      {/if}
                     </div>
                   </li>
                 {/each}
