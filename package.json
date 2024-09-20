@@ -52,7 +52,7 @@
     "svelte-tags-input": "^5.0.0",
     "tailwind-merge": "^1.14.0",
     "tailwind-variants": "^0.1.20",
-    "viem": "^2.21.4"
+    "viem": "^2.21.10"
   },
   "trustedDependencies": [
     "@sveltejs/kit",
