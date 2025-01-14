@@ -20,7 +20,7 @@ for (const [k, v] of Object.entries(chains)) {
   allChains.push(v)
 }
 
-allChains.push(defineChain({
+const ab = defineChain({
   id: 2741,
   name: 'abstract',
   nativeCurrency: {
@@ -35,6 +35,8 @@ allChains.push(defineChain({
   },
   contracts: {
   },
-}))
+})
+chainMap['abstract'] = ab
+allChains.push(ab)
 
 export { chainMap, allChains }
