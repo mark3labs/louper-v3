@@ -1,4 +1,3 @@
-import { defineChain } from 'viem'
 import * as chains from 'viem/chains'
 import type { Chain } from 'viem/chains'
 
@@ -19,24 +18,5 @@ for (const [k, v] of Object.entries(chains)) {
   chainMap[k] = v
   allChains.push(v)
 }
-
-const ab = defineChain({
-  id: 2741,
-  name: 'abstract',
-  nativeCurrency: {
-    decimals: 18,
-    name: 'Abstract Mainnet',
-    symbol: 'ETH',
-  },
-  rpcUrls: {
-    default: {
-      http: ['https://api.raas.matterhosted.dev'],
-    },
-  },
-  contracts: {
-  },
-})
-chainMap['abstract'] = ab
-allChains.push(ab)
 
 export { chainMap, allChains }
