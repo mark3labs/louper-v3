@@ -82,8 +82,14 @@
       >
         <ExternalLink />
       </Button>
+    </p>
+  </div>
+  <!-- Move the magnifying glass btn here into a new div and add the text View Diamond ABI -->
+  <div class="mt-5">
+    <div class="flex items-center gap-2 mb-4">
       <Dialog.Root>
-        <Dialog.Trigger>
+        <Dialog.Trigger class="inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+          <span>View Diamond ABI</span>
           <MagnifyingGlass />
         </Dialog.Trigger>
         <Dialog.Content class="min-w-fit">
@@ -109,9 +115,7 @@
           </Dialog.Header>
         </Dialog.Content>
       </Dialog.Root>
-    </p>
-  </div>
-  <div class="mt-5">
+    </div>
     <Tabs.Root bind:value={selectedTab} class="w-full">
       <Tabs.List class="mb-5">
         <Tabs.Trigger value="facets" on:click={disconnect}>Facets</Tabs.Trigger>
