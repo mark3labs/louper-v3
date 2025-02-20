@@ -10,6 +10,7 @@ import {
   type Address,
   toFunctionSelector,
   type Abi,
+  fallback,
 } from 'viem'
 import type { Chain } from 'viem/chains'
 import { chainMap } from '$lib/chains'
@@ -26,7 +27,7 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
 
   const publicClient = createPublicClient({
     chain,
-    transport: http(),
+    transport: fallback([http(`http://erpc:4000/main/evm/${chain.id}`), http()]),
   })
   const abi = parseAbi(['function facets() view returns ((address,bytes4[])[])'])
 
