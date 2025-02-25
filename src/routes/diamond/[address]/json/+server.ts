@@ -47,12 +47,20 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
       facets: [],
     }
 
-    // Fetch all facet information
-    for (const [address, selectors] of facetData) {
-      const facet = await buildFacet(address, selectors, chain.id, locals.db)
-      if (!facet) continue
-      diamond.facets.push(facet)
-      diamondAbi = [...diamondAbi, ...facet.abi]
+    // Fetch all facet information asynchronously
+    const facetPromises = facetData.map(([address, selectors]) => 
+      buildFacet(address, selectors, chain.id, locals.db)
+    );
+
+    // Wait for all promises to resolve
+    const facets = await Promise.all(facetPromises);
+
+    // Filter out any undefined facets and add them to the diamond
+    diamond.facets = facets.filter(facet => facet !== undefined);
+
+    // Combine all facet ABIs into the diamond ABI
+    for (const facet of diamond.facets) {
+      diamondAbi = [...diamondAbi, ...facet.abi];
     }
 
     // Udate the database
