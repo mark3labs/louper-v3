@@ -28,9 +28,6 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
   const transports = [
     http(`http://erpc:4000/main/evm/${chain.id}`),
     ...chain.rpcUrls.default.http.map((url) => http(url)),
-    ...chain.rpcUrls.public.http
-      .filter((url) => !chain.rpcUrls.default.http.includes(url))
-      .map((url) => http(url)),
   ]
 
   const publicClient = createPublicClient({
