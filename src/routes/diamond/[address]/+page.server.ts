@@ -25,9 +25,14 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
 
   const chain: Chain = chainMap[network]
 
+  const transports = [
+    http(`http://erpc:4000/main/evm/${chain.id}`),
+    ...chain.rpcUrls.default.http.map((url) => http(url)),
+  ]
+
   const publicClient = createPublicClient({
     chain,
-    transport: fallback([http(`http://erpc:4000/main/evm/${chain.id}`), http()]),
+    transport: fallback(transports),
   })
   const abi = parseAbi(['function facets() view returns ((address,bytes4[])[])'])
 
@@ -49,19 +54,19 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
 
     // AI! do this process asyncronously and wait for all promises to resolve
     // Fetch all facet information asynchronously
-    const facetPromises = facetData.map(([address, selectors]) => 
-      buildFacet(address, selectors, chain.id, locals.db)
-    );
+    const facetPromises = facetData.map(([address, selectors]) =>
+      buildFacet(address, selectors, chain.id, locals.db),
+    )
 
     // Wait for all promises to resolve
-    const facets = await Promise.all(facetPromises);
+    const facets = await Promise.all(facetPromises)
 
     // Filter out any undefined facets and add them to the diamond
-    diamond.facets = facets.filter(facet => facet !== undefined);
+    diamond.facets = facets.filter((facet) => facet !== undefined)
 
     // Combine all facet ABIs into the diamond ABI
     for (const facet of diamond.facets) {
-      diamondAbi = [...diamondAbi, ...facet.abi];
+      diamondAbi = [...diamondAbi, ...facet.abi]
     }
 
     // Udate the database
