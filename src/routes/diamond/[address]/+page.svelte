@@ -15,7 +15,7 @@
     wagmiConfig,
   } from '$lib/stores/wagmi'
   import type { Chain } from 'viem'
-  import { createPublicClient, http } from 'viem'
+  import { createPublicClient, http, fallback } from 'viem'
   import type { PageData } from './$types'
   import EditFacet from './EditFacet.svelte'
   import FacetsTable from './FacetsTable.svelte'
@@ -29,9 +29,12 @@
   let selectedTab = $page.url.hash.replace('#', '') || 'facets'
 
   const chain: Chain = chainMap[data.chain]
+
+  const transports = chain.rpcUrls.default.http.map((url) => http(url))
+
   const publicClient = createPublicClient({
     chain: chain,
-    transport: http(),
+    transport: fallback(transports),
   })
 
   setContext('diamond', data.diamond)
@@ -88,7 +91,9 @@
   <div class="mt-5">
     <div class="flex items-center gap-2 mb-4">
       <Dialog.Root>
-        <Dialog.Trigger class="inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+        <Dialog.Trigger
+          class="inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
           <span>View Diamond ABI</span>
           <MagnifyingGlass />
         </Dialog.Trigger>
