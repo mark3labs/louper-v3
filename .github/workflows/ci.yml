@@ -26,6 +26,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
+          build-args: |
+            BUILD_ENV=production
           tags: |
             mark3labs/louper-web:${{ steps.vars.outputs.version }}
             mark3labs/louper-web:latest

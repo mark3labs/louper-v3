@@ -1,5 +1,8 @@
 FROM oven/bun:1.1.20-slim
 
+# Build argument to determine if this is production
+ARG BUILD_ENV=development
+
 WORKDIR /app
 
 # Copy package files
@@ -10,6 +13,9 @@ RUN bun install
 
 # Copy application code
 COPY . .
+
+# Set build environment variable for SvelteKit build
+ENV PUBLIC_BUILD_ENV=$BUILD_ENV
 
 # Build the application
 RUN bun run build
