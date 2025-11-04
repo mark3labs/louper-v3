@@ -5,4 +5,8 @@ build
 .k8s
 node_modules
 .env
+.svelte-kit
+.vite
+*.log
+.DS_Store
 
