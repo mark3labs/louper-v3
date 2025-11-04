@@ -23,7 +23,7 @@
   import WriteFacetMethods from './WriteFacetMethods.svelte'
   import { page } from '$app/stores'
   import { browser } from '$app/environment'
-  import { pushState } from '$app/navigation'
+  import { goto } from '$app/navigation'
 
   export let data: PageData
   let selectedTab = $page.url.hash.replace('#', '') || 'facets'
