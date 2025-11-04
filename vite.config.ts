@@ -14,4 +14,9 @@ export default defineConfig({
     }),
     sveltekit(),
   ],
+  build: {
+    rollupOptions: {
+      external: ['bun:sqlite'],
+    },
+  },
 })
