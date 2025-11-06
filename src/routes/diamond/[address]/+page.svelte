@@ -6,7 +6,7 @@
   import { copyToClipboard } from '$lib/utils'
   import { switchChain } from '@wagmi/core'
   import { Copy, ExternalLink, Search } from '@lucide/svelte'
-  import { onDestroy, onMount, setContext } from 'svelte'
+  import { onMount, setContext } from 'svelte'
   import { pushState } from '$app/navigation'
   import {
     chainId,
@@ -24,7 +24,6 @@
   import WriteFacetMethods from './WriteFacetMethods.svelte'
   import { page } from '$app/stores'
   import { browser } from '$app/environment'
-  import { goto } from '$app/navigation'
 
   let { data }: { data: PageData } = $props()
   let selectedTab = $state($page.url.hash.replace('#', '') || 'facets')
@@ -52,22 +51,24 @@
   })
 
   const disconnect = async () => {
-    if (browser) {
+    if (browser && $connected) {
       const url = `${$page.url.pathname}${$page.url.search}#${selectedTab}`
       pushState(url, { url })
-
-      if (!$connected) return
       await disconnectWagmi()
     }
   }
 
-  onDestroy(async () => {
-    await disconnect()
-  })
-
+  // Handle chain switching in Svelte 5 effect
   $effect(() => {
-    if ($connected && $chainId !== chain.id) {
-      switchChain($wagmiConfig, { chainId: chain.id }).catch(() => disconnectWagmi())
+    const currentConnected = $connected
+    const currentChainId = $chainId
+    const currentConfig = $wagmiConfig
+    
+    if (currentConnected && currentChainId && currentChainId !== chain.id && currentConfig) {
+      switchChain(currentConfig, { chainId: chain.id }).catch((error) => {
+        console.warn('Failed to switch chain:', error)
+        disconnectWagmi()
+      })
     }
   })
 </script>

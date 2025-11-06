@@ -3,7 +3,7 @@
   import * as Popover from '$lib/components/ui/popover'
   import { switchChain } from '@wagmi/core'
   import { Dot } from '@lucide/svelte'
-  import { getContext, onMount } from 'svelte'
+  import { getContext, onMount, untrack } from 'svelte'
   import {
     chainId,
     connected,
@@ -18,8 +18,8 @@
   import { safe } from '@wagmi/connectors'
   import SafeAppsSDK from '@safe-global/safe-apps-sdk'
 
-  let busy = false
-  let isSafeApp = false
+  let busy = $state(false)
+  let isSafeApp = $state(false)
 
   const chain = getContext<Chain>('chain')
 
@@ -31,7 +31,7 @@
           connector: safe(),
         })
       } else {
-        await $web3Modal.open()
+        await $web3Modal?.open()
       }
       if ($connected && $chainId !== chain.id) {
         await switchChain($wagmiConfig, { chainId: chain.id })
@@ -48,22 +48,35 @@
   }
 
   const disconnectWallet = async () => {
-    isUsingSafe.set(false)
-    await disconnectWagmi()
+    busy = true
+    try {
+      isUsingSafe.set(false)
+      await disconnectWagmi()
+    } finally {
+      busy = false
+    }
   }
 
-  onMount(async () => {
+  onMount(() => {
     // check if we're in an iframe
     if (window?.parent === window) {
       return
     }
 
-    const sdk = new SafeAppsSDK()
-    const safe = await Promise.race([
-      sdk.safe.getInfo(),
-      new Promise<undefined>((resolve) => setTimeout(resolve, 200)),
-    ])
-    isSafeApp = !!safe
+    const checkSafeApp = async () => {
+      try {
+        const sdk = new SafeAppsSDK()
+        const safe = await Promise.race([
+          sdk.safe.getInfo(),
+          new Promise<undefined>((resolve) => setTimeout(resolve, 200)),
+        ])
+        isSafeApp = !!safe
+      } catch (error) {
+        console.warn('Error checking Safe app:', error)
+      }
+    }
+
+    checkSafeApp()
   })
 </script>
 
