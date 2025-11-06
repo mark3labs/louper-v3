@@ -1,0 +1,373 @@
+openapi: 3.0.0
+info:
+  title: Dependency Upgrade Migration API
+  version: 1.0.0
+  description: API contract for managing the framework and dependency upgrade process
+  
+paths:
+  /migration/status:
+    get:
+      summary: Get current migration status
+      operationId: getMigrationStatus
+      tags:
+        - Migration
+      responses:
+        '200':
+          description: Current migration status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MigrationStatus'
+                
+  /migration/validate:
+    post:
+      summary: Validate migration readiness
+      operationId: validateMigration
+      tags:
+        - Migration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationRequest'
+      responses:
+        '200':
+          description: Validation results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        '400':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+  /migration/execute:
+    post:
+      summary: Execute migration phase
+      operationId: executeMigration
+      tags:
+        - Migration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MigrationRequest'
+      responses:
+        '202':
+          description: Migration phase started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MigrationResponse'
+        '400':
+          description: Invalid migration phase
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+  /migration/rollback:
+    post:
+      summary: Rollback migration to previous state
+      operationId: rollbackMigration
+      tags:
+        - Migration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RollbackRequest'
+      responses:
+        '200':
+          description: Rollback successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RollbackResponse'
+        '500':
+          description: Rollback failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /dependencies/current:
+    get:
+      summary: Get current dependency versions
+      operationId: getCurrentDependencies
+      tags:
+        - Dependencies
+      responses:
+        '200':
+          description: Current dependency list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyList'
+                
+  /dependencies/target:
+    get:
+      summary: Get target dependency versions
+      operationId: getTargetDependencies
+      tags:
+        - Dependencies
+      responses:
+        '200':
+          description: Target dependency list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DependencyList'
+                
+  /dependencies/compatibility:
+    post:
+      summary: Check dependency compatibility
+      operationId: checkCompatibility
+      tags:
+        - Dependencies
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompatibilityRequest'
+      responses:
+        '200':
+          description: Compatibility check results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompatibilityResponse'
+
+components:
+  schemas:
+    MigrationStatus:
+      type: object
+      required:
+        - phase
+        - status
+        - startTime
+      properties:
+        phase:
+          type: string
+          enum:
+            - not_started
+            - backup
+            - core_update
+            - svelte_migration
+            - dependency_update
+            - component_regeneration
+            - testing
+            - completed
+            - failed
+        status:
+          type: string
+          enum:
+            - pending
+            - in_progress
+            - completed
+            - failed
+            - rolled_back
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        currentStep:
+          type: string
+        totalSteps:
+          type: integer
+        completedSteps:
+          type: integer
+        errors:
+          type: array
+          items:
+            type: string
+            
+    ValidationRequest:
+      type: object
+      required:
+        - checks
+      properties:
+        checks:
+          type: array
+          items:
+            type: string
+            enum:
+              - git_status
+              - test_suite
+              - build_success
+              - dependency_audit
+              - backup_exists
+              
+    ValidationResponse:
+      type: object
+      required:
+        - valid
+        - checks
+      properties:
+        valid:
+          type: boolean
+        checks:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              passed:
+                type: boolean
+              message:
+                type: string
+              details:
+                type: object
+                
+    MigrationRequest:
+      type: object
+      required:
+        - phase
+      properties:
+        phase:
+          type: string
+          enum:
+            - backup
+            - core_update
+            - svelte_migration
+            - dependency_update
+            - component_regeneration
+            - testing
+        options:
+          type: object
+          properties:
+            skipTests:
+              type: boolean
+            forceOverwrite:
+              type: boolean
+            preserveCustom:
+              type: boolean
+              
+    MigrationResponse:
+      type: object
+      required:
+        - id
+        - phase
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        phase:
+          type: string
+        status:
+          type: string
+        estimatedDuration:
+          type: integer
+          description: Estimated duration in seconds
+          
+    RollbackRequest:
+      type: object
+      required:
+        - targetPhase
+      properties:
+        targetPhase:
+          type: string
+          enum:
+            - initial
+            - after_backup
+            - after_core_update
+            - after_svelte_migration
+        reason:
+          type: string
+          
+    RollbackResponse:
+      type: object
+      required:
+        - success
+        - restoredPhase
+      properties:
+        success:
+          type: boolean
+        restoredPhase:
+          type: string
+        filesRestored:
+          type: integer
+        message:
+          type: string
+          
+    DependencyList:
+      type: object
+      required:
+        - dependencies
+        - devDependencies
+      properties:
+        dependencies:
+          type: object
+          additionalProperties:
+            type: string
+        devDependencies:
+          type: object
+          additionalProperties:
+            type: string
+            
+    CompatibilityRequest:
+      type: object
+      required:
+        - packages
+      properties:
+        packages:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              currentVersion:
+                type: string
+              targetVersion:
+                type: string
+                
+    CompatibilityResponse:
+      type: object
+      required:
+        - compatible
+        - issues
+      properties:
+        compatible:
+          type: boolean
+        issues:
+          type: array
+          items:
+            type: object
+            properties:
+              package:
+                type: string
+              issue:
+                type: string
+              severity:
+                type: string
+                enum:
+                  - error
+                  - warning
+                  - info
+              resolution:
+                type: string
+                
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object

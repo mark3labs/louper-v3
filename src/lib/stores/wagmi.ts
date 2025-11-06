@@ -109,21 +109,35 @@ export const connection = async () => {
 
 export const WC = async () => {
   try {
-    get(web3Modal).open()
+    const modal = get(web3Modal)
+    if (!modal) {
+      console.warn('Web3Modal not initialized')
+      return { success: false }
+    }
+    modal.open()
     // await waitForAccount();
 
-    return { succcess: true }
+    return { success: true }
   } catch (err) {
+    console.error('Error opening WalletConnect:', err)
     return { success: false }
   }
 }
 
 export const disconnectWagmi = async () => {
-  await disconnect(get(wagmiConfig) as Config)
-  connected.set(false)
-  chainId.set(null)
-  signerAddress.set(null)
-  loading.set(false)
+  try {
+    const config = get(wagmiConfig)
+    if (!config) return
+    await disconnect(config as Config)
+  } catch (error) {
+    // Silently handle disconnect errors in production
+    console.warn('Error disconnecting wallet:', error)
+  } finally {
+    connected.set(false)
+    chainId.set(null)
+    signerAddress.set(null)
+    loading.set(false)
+  }
 }
 
 const waitForConnection = (): Promise<GetAccountReturnType> =>

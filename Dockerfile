@@ -1,4 +1,4 @@
-FROM oven/bun:1.1.20-slim
+FROM oven/bun:1.3.0-slim
 
 # Build argument to determine if this is production
 ARG BUILD_ENV=development

@@ -1,12 +1,18 @@
 <script lang="ts">
   import { Select as SelectPrimitive } from 'bits-ui'
+  import type { Snippet } from 'svelte'
 
-  type $$Props = SelectPrimitive.Props
+  type Props = {
+    selected?: string
+    open?: boolean
+    children?: Snippet
+  }
 
-  export let selected: $$Props['selected'] = undefined
-  export let open: $$Props['open'] = undefined
+  let { selected = $bindable(undefined), open = $bindable(undefined), children, ...restProps }: Props = $props()
 </script>
 
-<SelectPrimitive.Root bind:selected bind:open {...$$restProps}>
-  <slot />
+<SelectPrimitive.Root type="single" bind:value={selected} bind:open {...restProps}>
+  {#if children}
+    {@render children()}
+  {/if}
 </SelectPrimitive.Root>

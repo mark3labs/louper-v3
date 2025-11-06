@@ -1,7 +1,7 @@
 <script>
   import { goto } from '$app/navigation'
   import Button from '$lib/components/ui/button/button.svelte'
-  import { MagnifyingGlass } from 'radix-icons-svelte'
+  import { Search } from '@lucide/svelte'
 
   const diamonds = [
     {
@@ -74,9 +74,9 @@
         <Button
           class="tracking-tight text-sm font-medium"
           variant="ghost"
-          on:click={() => goto(d.url, { replaceState: true })}
+          onclick={() => goto(d.url, { replaceState: true })}
         >
-          <MagnifyingGlass />
+          <Search />
         </Button>
         <img src={d.icon} alt="" class="rounded-full h-10 w-10" />
       </div>

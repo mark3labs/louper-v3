@@ -19,4 +19,13 @@ export default defineConfig({
       external: ['bun:sqlite'],
     },
   },
+  server: {
+    fs: {
+      // Allow serving files from the project root
+      strict: false,
+    },
+  },
+  optimizeDeps: {
+    exclude: ['svelte-tags-input'],
+  },
 })

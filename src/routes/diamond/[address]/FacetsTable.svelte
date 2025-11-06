@@ -3,7 +3,7 @@
   import * as Dialog from '$lib/components/ui/dialog'
   import { Button } from '$lib/components/ui/button'
   import type { Diamond } from '$lib/types'
-  import { Copy, CaretSort, MagnifyingGlass, ExternalLink } from 'radix-icons-svelte'
+  import { Copy, ChevronsUpDown, Search, ExternalLink } from '@lucide/svelte'
   import { getContext } from 'svelte'
   import { copyToClipboard, abiMethods } from '$lib/utils'
   import * as Collapsible from '$lib/components/ui/collapsible'
@@ -32,7 +32,7 @@
           <p class="font-medium leading-none text-2xl text-primary">{f.name}</p>
           <p class="text-lg text-muted-foreground">
             {f.address}
-            <Button variant="ghost" on:click={() => copyToClipboard(f.address)} class="p-1">
+            <Button variant="ghost" onclick={() => copyToClipboard(f.address)} class="p-1">
               <Copy />
             </Button>
             <Button
@@ -48,14 +48,14 @@
         <Table.Cell class="w-1/2">
           <Collapsible.Root>
             <div class="flex items-center justify-start space-x-4">
-              <Badge variant="secondary" class="font-bold">
-                {abiMethods(f.abi).length} Methods
-              </Badge>
-              <Collapsible.Trigger asChild let:builder>
-                <Button builders={[builder]} variant="ghost" size="sm" class="w-9 p-0">
-                  <CaretSort class="h-4 w-4" />
-                  <span class="sr-only">Toggle</span>
-                </Button>
+              <Badge variant="secondary">{f.abi.filter((m) => m.type === 'function').length} Methods</Badge>
+              <Collapsible.Trigger>
+                {#snippet child({ props }: { props: any })}
+                  <Button {...props} variant="ghost" size="sm" class="w-9 p-0">
+                    <ChevronsUpDown class="h-4 w-4" />
+                    <span class="sr-only">Toggle</span>
+                  </Button>
+                {/snippet}
               </Collapsible.Trigger>
             </div>
             <Collapsible.Content>
@@ -78,7 +78,7 @@
                         </code>
                         <Button
                           variant="ghost"
-                          on:click={() => copyToClipboard(m.name.split('_')[1])}
+                          onclick={() => copyToClipboard(m.name.split('_')[1])}
                         >
                           <Copy />
                         </Button>
@@ -90,7 +90,7 @@
                         </code>
                         <Button
                           variant="ghost"
-                          on:click={() => copyToClipboard(toFunctionSelector(m))}
+                          onclick={() => copyToClipboard(toFunctionSelector(m))}
                         >
                           <Copy />
                         </Button>
@@ -105,7 +105,11 @@
         <Table.Cell class="text-center">
           <Dialog.Root>
             <Dialog.Trigger>
-              <MagnifyingGlass />
+              {#snippet child({ props }: { props: any })}
+                <button {...props} type="button" class="inline-flex items-center justify-center">
+                  <Search />
+                </button>
+              {/snippet}
             </Dialog.Trigger>
             <Dialog.Content class="min-w-fit">
               <Dialog.Header>
@@ -121,7 +125,7 @@
                     <Button
                       variant="ghost"
                       class="absolute top-3 right-3"
-                      on:click={() => copyToClipboard(JSON.stringify(f.abi))}
+                      onclick={() => copyToClipboard(JSON.stringify(f.abi))}
                     >
                       <Copy />
                     </Button>
