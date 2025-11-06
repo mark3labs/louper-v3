@@ -1,17 +1,16 @@
 <script lang="ts">
-  import { allChains, chainMap } from '$lib/chains'
+  import { chainMap } from '$lib/chains'
   import { Button } from '$lib/components/ui/button'
   import * as Dialog from '$lib/components/ui/dialog'
   import * as Tabs from '$lib/components/ui/tabs'
   import { copyToClipboard } from '$lib/utils'
   import { switchChain } from '@wagmi/core'
   import { Copy, ExternalLink, Search } from '@lucide/svelte'
-  import { onDestroy, onMount, setContext } from 'svelte'
+  import { setContext } from 'svelte'
   import { pushState } from '$app/navigation'
   import {
     chainId,
     connected,
-    defaultConfig,
     disconnectWagmi,
     wagmiConfig,
   } from '$lib/stores/wagmi'
@@ -43,13 +42,6 @@
   setContext('publicClient', publicClient)
 
   const explorerUrl = chain?.blockExplorers?.default.url || 'https://etherscan.io'
-  onMount(async () => {
-    const louper = defaultConfig({
-      walletConnectProjectId: '6d8897eb4adc9e4bb2f608642115f17a',
-      chains: allChains as [Chain],
-    })
-    await louper.init()
-  })
 
   const disconnect = async () => {
     if (browser) {
@@ -60,10 +52,6 @@
       await disconnectWagmi()
     }
   }
-
-  onDestroy(async () => {
-    await disconnect()
-  })
 
   $effect(() => {
     if ($connected && $chainId !== chain.id) {

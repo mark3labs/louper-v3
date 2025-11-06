@@ -27,13 +27,25 @@
     try {
       busy = true
       if (isSafeApp) {
+        if (!$wagmiConfig) {
+          console.error('Wagmi config not initialized')
+          return
+        }
         await connect($wagmiConfig, {
           connector: safe(),
         })
       } else {
+        if (!$web3Modal) {
+          console.error('Web3Modal not initialized')
+          return
+        }
         await $web3Modal.open()
       }
       if ($connected && $chainId !== chain.id) {
+        if (!$wagmiConfig) {
+          console.error('Wagmi config not initialized for chain switch')
+          return
+        }
         await switchChain($wagmiConfig, { chainId: chain.id })
       }
       if (isSafeApp) {

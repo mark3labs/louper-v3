@@ -109,7 +109,12 @@ export const connection = async () => {
 
 export const WC = async () => {
   try {
-    get(web3Modal).open()
+    const modal = get(web3Modal)
+    if (!modal) {
+      console.warn('Web3Modal not initialized')
+      return { success: false }
+    }
+    modal.open()
     // await waitForAccount();
 
     return { succcess: true }
@@ -119,11 +124,21 @@ export const WC = async () => {
 }
 
 export const disconnectWagmi = async () => {
-  await disconnect(get(wagmiConfig) as Config)
-  connected.set(false)
-  chainId.set(null)
-  signerAddress.set(null)
-  loading.set(false)
+  const config = get(wagmiConfig)
+  if (!config) {
+    console.warn('Wagmi config not initialized')
+    return
+  }
+  try {
+    await disconnect(config as Config)
+  } catch (error) {
+    console.error('Error disconnecting:', error)
+  } finally {
+    connected.set(false)
+    chainId.set(null)
+    signerAddress.set(null)
+    loading.set(false)
+  }
 }
 
 const waitForConnection = (): Promise<GetAccountReturnType> =>

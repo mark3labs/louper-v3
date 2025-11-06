@@ -3,17 +3,19 @@
   import '../app.postcss'
   import { Check, ChevronUp, Search, Terminal } from '@lucide/svelte'
   import type { Address } from 'viem'
-  import { chainMap } from '$lib/chains'
+  import { allChains, chainMap } from '$lib/chains'
   import * as Popover from '$lib/components/ui/popover'
   import { afterNavigate, goto } from '$app/navigation'
   import { navigating } from '$app/stores'
   import { page } from '$app/stores'
   import * as Command from '$lib/components/ui/command'
-  import { tick } from 'svelte'
+  import { tick, onMount } from 'svelte'
   import { cn } from '$lib/utils'
   import { Button } from '$lib/components/ui/button'
   import * as Alert from '$lib/components/ui/alert'
   import type { Snippet } from 'svelte'
+  import { defaultConfig } from '$lib/stores/wagmi'
+  import type { Chain } from 'viem'
 
   let {
     children
@@ -24,6 +26,15 @@
   let network: string | undefined = $state()
   let address: Address | undefined = $state()
   let searchOpen = $state(false)
+
+  // Initialize wagmi globally on mount
+  onMount(async () => {
+    const louper = defaultConfig({
+      walletConnectProjectId: '6d8897eb4adc9e4bb2f608642115f17a',
+      chains: allChains as [Chain],
+    })
+    await louper.init()
+  })
 
   const chainOptions = Object.entries(chainMap).map(([key, chain]) => ({
     value: key,
