@@ -13,6 +13,13 @@
   import { cn } from '$lib/utils'
   import { Button } from '$lib/components/ui/button'
   import * as Alert from '$lib/components/ui/alert'
+  import type { Snippet } from 'svelte'
+
+  let {
+    children
+  }: {
+    children: Snippet
+  } = $props()
 
   let network: string | undefined = $state()
   let address: Address | undefined = $state()
@@ -112,7 +119,7 @@
             />
           </div>
           <div>
-            <Popover.Root bind:open={searchOpen} preventScroll>
+            <Popover.Root bind:open={searchOpen}>
               <Popover.Trigger>
                 {#snippet child({ props }: { props: any })}
                   <Button
@@ -170,7 +177,7 @@
           <span class="text-xl font-bold text-primary">Loading...</span>
         </div>
       {:else}
-        <slot />
+        {@render children()}
       {/if}
     </div>
   </div>

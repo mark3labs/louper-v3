@@ -82,7 +82,7 @@
         >{selectedFacet ?? 'Choose a facet to interact with.'}</Table.Head
       >
       <Table.Head class="flex items-center justify-end">
-        <Popover.Root bind:open={comboboxOpen} preventScroll>
+        <Popover.Root bind:open={comboboxOpen}>
           <Popover.Trigger>
             {#snippet child({ props }: { props: any })}
               <Button
