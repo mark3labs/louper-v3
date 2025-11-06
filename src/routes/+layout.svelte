@@ -127,26 +127,28 @@
                   </Button>
                 {/snippet}
               </Popover.Trigger>
-              <Popover.Content class="w-[200px] p-0 h-96">
+              <Popover.Content class="w-[200px] p-0">
                 <Command.Root>
                   <Command.Input placeholder="Search chains..." />
-                  <Command.Empty>No chain found.</Command.Empty>
-                  <Command.Group>
-                    {#each chainOptions as chain}
-                      <Command.Item
-                        value={chain.value}
-                        onSelect={() => {
-                          network = chain.value
-                          searchOpen = false
-                        }}
-                      >
-                        <Check
-                          class={cn('mr-2 h-4 w-4', network !== chain.value && 'text-transparent')}
-                        />
-                        {chain.label}
-                      </Command.Item>
-                    {/each}
-                  </Command.Group>
+                  <Command.List>
+                    <Command.Empty>No chain found.</Command.Empty>
+                    <Command.Group>
+                      {#each chainOptions as chain}
+                        <Command.Item
+                          value={chain.value}
+                          onSelect={() => {
+                            network = chain.value
+                            searchOpen = false
+                          }}
+                        >
+                          <Check
+                            class={cn('mr-2 h-4 w-4', network !== chain.value && 'text-transparent')}
+                          />
+                          {chain.label}
+                        </Command.Item>
+                      {/each}
+                    </Command.Group>
+                  </Command.List>
                 </Command.Root>
               </Popover.Content>
             </Popover.Root>

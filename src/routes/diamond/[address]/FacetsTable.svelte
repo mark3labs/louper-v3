@@ -48,7 +48,7 @@
         <Table.Cell class="w-1/2">
           <Collapsible.Root>
             <div class="flex items-center justify-start space-x-4">
-              <h4 class="text-sm font-semibold">{f.abi.filter((m) => m.type === 'function').length}</h4>
+              <Badge variant="secondary">{f.abi.filter((m) => m.type === 'function').length} Methods</Badge>
               <Collapsible.Trigger>
                 {#snippet child({ props }: { props: any })}
                   <Button {...props} variant="ghost" size="sm" class="w-9 p-0">
