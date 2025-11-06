@@ -74,7 +74,7 @@
         <Button
           class="tracking-tight text-sm font-medium"
           variant="ghost"
-          on:click={() => goto(d.url, { replaceState: true })}
+          onclick={() => goto(d.url, { replaceState: true })}
         >
           <Search />
         </Button>

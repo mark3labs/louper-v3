@@ -158,7 +158,7 @@
                 </p>
                 <p class="text-lg text-muted-foreground">
                   {toFunctionSelector(m)}
-                  <Button variant="ghost" on:click={() => copyToClipboard(toFunctionSelector(m))}>
+                  <Button variant="ghost" onclick={() => copyToClipboard(toFunctionSelector(m))}>
                     <Copy />
                   </Button>
                 </p>
@@ -166,7 +166,7 @@
             </div>
             <Collapsible.Content class="p-5 flex flex-col space-y-3">
               <form
-                on:submit|preventDefault={() => writeContract(idx)}
+                onsubmit={(e) => { e.preventDefault(); writeContract(idx); }}
                 class="flex flex-col space-y-3"
               >
                 {#if m.stateMutability === 'payable'}

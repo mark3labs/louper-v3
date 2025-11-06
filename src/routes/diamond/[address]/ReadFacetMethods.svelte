@@ -119,7 +119,7 @@
                 </p>
                 <p class="text-lg text-muted-foreground">
                   {toFunctionSelector(m)}
-                  <Button variant="ghost" on:click={() => copyToClipboard(toFunctionSelector(m))}>
+                  <Button variant="ghost" onclick={() => copyToClipboard(toFunctionSelector(m))}>
                     <Copy />
                   </Button>
                 </p>
@@ -127,7 +127,7 @@
             </div>
             <Collapsible.Content class="p-5 flex flex-col space-y-3">
               <form
-                on:submit|preventDefault={() => queryContract(idx)}
+                onsubmit={(e) => { e.preventDefault(); queryContract(idx); }}
                 class="flex flex-col space-y-3"
               >
                 {#each m.inputs as input, i}

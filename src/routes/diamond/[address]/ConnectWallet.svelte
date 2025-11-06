@@ -78,9 +78,9 @@
       {/snippet}
     </Popover.Trigger>
     <Popover.Content class="text-center">
-      <Button on:click={disconnectWallet}>Disconnect</Button>
+      <Button onclick={disconnectWallet}>Disconnect</Button>
     </Popover.Content>
   </Popover.Root>
 {:else}
-  <Button on:click={connectWallet} disabled={busy}>Connect Wallet</Button>
+  <Button onclick={connectWallet} disabled={busy}>Connect Wallet</Button>
 {/if}

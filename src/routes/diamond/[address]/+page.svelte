@@ -75,7 +75,7 @@
     <p class="text-4xl text-primary font-bold">{data.diamond.name}</p>
     <p class="text-xl text-muted-foreground font-bold">
       {data.diamond.address}
-      <Button variant="ghost" on:click={() => copyToClipboard(data.diamond.address)} class="p-1">
+      <Button variant="ghost" onclick={() => copyToClipboard(data.diamond.address)} class="p-1">
         <Copy />
       </Button>
       <Button
@@ -112,7 +112,7 @@
                 <Button
                   variant="ghost"
                   class="absolute top-3 right-3"
-                  on:click={() => copyToClipboard(JSON.stringify(data.diamondAbi))}
+                  onclick={() => copyToClipboard(JSON.stringify(data.diamondAbi))}
                 >
                   <Copy />
                 </Button>
@@ -124,11 +124,11 @@
     </div>
     <Tabs.Root bind:value={selectedTab} class="w-full">
       <Tabs.List class="mb-5">
-        <Tabs.Trigger value="facets" on:click={disconnect}>Facets</Tabs.Trigger>
-        <Tabs.Trigger value="history" on:click={disconnect}>History</Tabs.Trigger>
-        <Tabs.Trigger value="read" on:click={disconnect}>Read</Tabs.Trigger>
-        <Tabs.Trigger value="write" on:click={disconnect}>Write</Tabs.Trigger>
-        <Tabs.Trigger value="edit" on:click={disconnect}>Edit</Tabs.Trigger>
+        <Tabs.Trigger value="facets" onclick={disconnect}>Facets</Tabs.Trigger>
+        <Tabs.Trigger value="history" onclick={disconnect}>History</Tabs.Trigger>
+        <Tabs.Trigger value="read" onclick={disconnect}>Read</Tabs.Trigger>
+        <Tabs.Trigger value="write" onclick={disconnect}>Write</Tabs.Trigger>
+        <Tabs.Trigger value="edit" onclick={disconnect}>Edit</Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content value="facets" class="border rounded-[0.5rem] p-5">
         <FacetsTable />

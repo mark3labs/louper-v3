@@ -292,7 +292,7 @@
             {#if addFacetError}
               <p class="text-red-500">{addFacetError}</p>
             {/if}
-            <form class="space-y-2 text-right my-5" on:submit|preventDefault={addFacet}>
+            <form class="space-y-2 text-right my-5" onsubmit={(e) => { e.preventDefault(); addFacet(); }}>
               <Input placeholder="Facet Address" bind:value={newFacetAddress} required />
               <Button disabled={busy} type="submit">Fetch Facet ABI</Button>
             </form>
@@ -316,7 +316,7 @@
         </AlertDialog.Header>
         <AlertDialog.Footer>
           <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-          <AlertDialog.Action on:click={upgrade}>Continue</AlertDialog.Action>
+          <AlertDialog.Action onclick={upgrade}>Continue</AlertDialog.Action>
         </AlertDialog.Footer>
       </AlertDialog.Content>
     </AlertDialog.Root>
@@ -354,7 +354,7 @@
           <p class="font-medium leading-none text-2xl text-primary">{f.name}</p>
           <p class="text-lg text-muted-foreground">
             {f.address}
-            <Button variant="ghost" on:click={() => copyToClipboard(f.address)}>
+            <Button variant="ghost" onclick={() => copyToClipboard(f.address)}>
               <Copy />
             </Button>
           </p>
@@ -414,7 +414,7 @@
           <p class="font-medium leading-none text-2xl text-primary">{f.name}</p>
           <p class="text-lg text-muted-foreground">
             {f.address}
-            <Button variant="ghost" on:click={() => copyToClipboard(f.address)}>
+            <Button variant="ghost" onclick={() => copyToClipboard(f.address)}>
               <Copy />
             </Button>
           </p>

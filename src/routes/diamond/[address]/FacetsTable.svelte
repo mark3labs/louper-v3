@@ -32,7 +32,7 @@
           <p class="font-medium leading-none text-2xl text-primary">{f.name}</p>
           <p class="text-lg text-muted-foreground">
             {f.address}
-            <Button variant="ghost" on:click={() => copyToClipboard(f.address)} class="p-1">
+            <Button variant="ghost" onclick={() => copyToClipboard(f.address)} class="p-1">
               <Copy />
             </Button>
             <Button
@@ -78,7 +78,7 @@
                         </code>
                         <Button
                           variant="ghost"
-                          on:click={() => copyToClipboard(m.name.split('_')[1])}
+                          onclick={() => copyToClipboard(m.name.split('_')[1])}
                         >
                           <Copy />
                         </Button>
@@ -90,7 +90,7 @@
                         </code>
                         <Button
                           variant="ghost"
-                          on:click={() => copyToClipboard(toFunctionSelector(m))}
+                          onclick={() => copyToClipboard(toFunctionSelector(m))}
                         >
                           <Copy />
                         </Button>
@@ -125,7 +125,7 @@
                     <Button
                       variant="ghost"
                       class="absolute top-3 right-3"
-                      on:click={() => copyToClipboard(JSON.stringify(f.abi))}
+                      onclick={() => copyToClipboard(JSON.stringify(f.abi))}
                     >
                       <Copy />
                     </Button>

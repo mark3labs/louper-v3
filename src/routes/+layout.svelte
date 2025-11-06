@@ -151,7 +151,7 @@
               </Popover.Content>
             </Popover.Root>
           </div>
-          <button on:click={gotoDiamond}>
+          <button onclick={gotoDiamond}>
             <Search class="h-6 w-8" />
           </button>
         </div>
