@@ -13,7 +13,7 @@
     type UpgradeStrategy,
   } from '$lib/types'
   import { abiMethods, copyToClipboard, getContractInformation } from '$lib/utils'
-  import { Copy } from 'radix-icons-svelte'
+  import { Copy } from '@lucide/svelte'
   import { getContext } from 'svelte'
   import {
     toFunctionSelector,
@@ -246,8 +246,9 @@
         if (k.slice(0, 5) === address.slice(0, 5)) {
           if (v.$$.ctx[2].disabled) continue
           const upFn = updateRemovals(address, k.slice(-10))
-          v.$set({ checked })
-          upFn(checked)
+          const boolChecked = checked === true || checked === 'indeterminate'
+          v.$set({ checked: boolChecked })
+          upFn(boolChecked)
         }
       }
     }
@@ -259,8 +260,9 @@
         if (k.slice(0, 5) === address.slice(0, 5)) {
           if (v.$$.ctx[2].disabled) continue
           const upFn = updateAdditionsAndReplacements(address, k.slice(-10))
-          v.$set({ checked })
-          upFn(checked)
+          const boolChecked = checked === true || checked === 'indeterminate'
+          v.$set({ checked: boolChecked })
+          upFn(boolChecked)
         }
       }
     }
@@ -279,7 +281,9 @@
   <div>
     <Dialog.Root bind:open={addFacetDialogOpen}>
       <Dialog.Trigger>
-        <Button variant="secondary">Add Facet</Button>
+        {#snippet child({ props }: { props: any })}
+          <Button {...props} variant="secondary">Add Facet</Button>
+        {/snippet}
       </Dialog.Trigger>
       <Dialog.Content>
         <Dialog.Header>
@@ -297,8 +301,10 @@
       </Dialog.Content>
     </Dialog.Root>
     <AlertDialog.Root>
-      <AlertDialog.Trigger disabled={!$connected}>
-        <Button disabled={!$connected}>Upgrade Diamond</Button>
+      <AlertDialog.Trigger>
+        {#snippet child({ props }: { props: any })}
+          <Button {...props} disabled={!$connected}>Upgrade Diamond</Button>
+        {/snippet}
       </AlertDialog.Trigger>
       <AlertDialog.Content>
         <AlertDialog.Header>

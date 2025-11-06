@@ -58,7 +58,7 @@
     <img src="/img/louper-logo.png" alt="Louper - The Ethereum Diamond Inspector" class="h-12" />
     <h2 class="ml-2 text-lg font-bold text-primary">Louper - The Ethereum Diamond Inspector</h2>
   </nav>
-  <nav class="flex flex-row items-center p-2" />
+  <nav class="flex flex-row items-center p-2"></nav>
 </div>
 
 <div class="pt-20 container max-w-2xl">
@@ -112,18 +112,20 @@
             />
           </div>
           <div>
-            <Popover.Root bind:open={searchOpen} let:ids preventScroll>
-              <Popover.Trigger asChild let:builder>
-                <Button
-                  builders={[builder]}
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={searchOpen}
-                  class="w-[200px] justify-between"
-                >
-                  {selectedValue}
-                  <ChevronUp class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
+            <Popover.Root bind:open={searchOpen} preventScroll>
+              <Popover.Trigger>
+                {#snippet child({ props }: { props: any })}
+                  <Button
+                    {...props}
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={searchOpen}
+                    class="w-[200px] justify-between"
+                  >
+                    {selectedValue}
+                    <ChevronUp class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                {/snippet}
               </Popover.Trigger>
               <Popover.Content class="w-[200px] p-0 h-96">
                 <Command.Root>
@@ -133,9 +135,9 @@
                     {#each chainOptions as chain}
                       <Command.Item
                         value={chain.value}
-                        onSelect={(currentValue) => {
-                          network = currentValue
-                          closeAndFocusTrigger(ids.trigger)
+                        onSelect={() => {
+                          network = chain.value
+                          searchOpen = false
                         }}
                       >
                         <Check

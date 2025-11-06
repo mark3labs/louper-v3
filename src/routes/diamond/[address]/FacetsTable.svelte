@@ -49,11 +49,13 @@
           <Collapsible.Root>
             <div class="flex items-center justify-start space-x-4">
               <h4 class="text-sm font-semibold">{f.abi.filter((m) => m.type === 'function').length}</h4>
-              <Collapsible.Trigger asChild let:builder>
-                <Button builders={[builder]} variant="ghost" size="sm" class="w-9 p-0">
-                  <ChevronsUpDown class="h-4 w-4" />
-                  <span class="sr-only">Toggle</span>
-                </Button>
+              <Collapsible.Trigger>
+                {#snippet child({ props }: { props: any })}
+                  <Button {...props} variant="ghost" size="sm" class="w-9 p-0">
+                    <ChevronsUpDown class="h-4 w-4" />
+                    <span class="sr-only">Toggle</span>
+                  </Button>
+                {/snippet}
               </Collapsible.Trigger>
             </div>
             <Collapsible.Content>
@@ -102,8 +104,12 @@
         </Table.Cell>
         <Table.Cell class="text-center">
           <Dialog.Root>
-            <Dialog.Trigger            >
-              <Search />
+            <Dialog.Trigger>
+              {#snippet child({ props }: { props: any })}
+                <button {...props} type="button" class="inline-flex items-center justify-center">
+                  <Search />
+                </button>
+              {/snippet}
             </Dialog.Trigger>
             <Dialog.Content class="min-w-fit">
               <Dialog.Header>

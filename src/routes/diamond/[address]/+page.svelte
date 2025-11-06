@@ -7,6 +7,7 @@
   import { switchChain } from '@wagmi/core'
   import { Copy, ExternalLink, Search } from '@lucide/svelte'
   import { onDestroy, onMount, setContext } from 'svelte'
+  import { pushState } from '$app/navigation'
   import {
     chainId,
     connected,

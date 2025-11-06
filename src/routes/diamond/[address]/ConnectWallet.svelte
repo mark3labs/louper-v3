@@ -2,7 +2,7 @@
   import Button from '$lib/components/ui/button/button.svelte'
   import * as Popover from '$lib/components/ui/popover'
   import { switchChain } from '@wagmi/core'
-  import { ShadowInner } from 'radix-icons-svelte'
+  import { Dot } from '@lucide/svelte'
   import { getContext, onMount } from 'svelte'
   import {
     chainId,
@@ -70,10 +70,12 @@
 {#if $connected && $signerAddress}
   <Popover.Root>
     <Popover.Trigger>
-      <Button variant="secondary" disabled={busy}>
-        <span class="text-green-500 font-medium"><ShadowInner class="h-4 w-4 mr-2" /></span>
-        {$signerAddress.slice(0, 5)}...{$signerAddress.slice(-4)}
-      </Button>
+      {#snippet child({ props }: { props: any })}
+        <Button {...props} variant="secondary" disabled={busy}>
+          <span class="text-green-500 font-medium"><Dot class="h-4 w-4 mr-2" /></span>
+          {$signerAddress.slice(0, 5)}...{$signerAddress.slice(-4)}
+        </Button>
+      {/snippet}
     </Popover.Trigger>
     <Popover.Content class="text-center">
       <Button on:click={disconnectWallet}>Disconnect</Button>
