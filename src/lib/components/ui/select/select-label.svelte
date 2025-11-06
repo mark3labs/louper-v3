@@ -2,12 +2,11 @@
   import { cn } from '$lib/utils'
   import type { HTMLAttributes } from 'svelte/elements'
 
-  type $$Props = HTMLAttributes<HTMLDivElement>
+  type Props = HTMLAttributes<HTMLDivElement>
 
-  let className: $$Props['class'] = undefined
-  export { className as class }
+  let { class: className, ...restProps }: Props = $props()
 </script>
 
-<div class={cn('px-2 py-1.5 text-sm font-semibold', className)} {...$$restProps}>
+<div class={cn('px-2 py-1.5 text-sm font-semibold', className)} {...restProps}>
   <slot />
 </div>

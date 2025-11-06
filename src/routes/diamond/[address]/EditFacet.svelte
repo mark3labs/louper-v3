@@ -39,21 +39,56 @@
   const diamond = getContext<Diamond>('diamond')
   const chain = getContext<Chain>('chain')
 
-  let newFacets: Contract[] = []
-  let newFacetAddress: Address | undefined
-  let addFacetDialogOpen = false
-  let addFacetError: string | undefined
-  let checkboxes: Record<string, Checkbox> = {}
-  let busy = false
-  let strategy: UpgradeStrategy = {
+  let newFacets: Contract[] = $state<Contract[]>([])
+  let newFacetAddress: Address | undefined = $state<Address | undefined>()
+  let addFacetDialogOpen = $state(false)
+  let addFacetError: string | undefined = $state<string | undefined>()
+  let checkboxStates: Record<string, { checked: boolean; disabled?: boolean }> = $state({})
+  let busy = $state(false)
+  let strategy: UpgradeStrategy = $state({
     additions: {},
     replacements: {},
     removals: {},
-  }
-  let initAddress: Address | undefined
-  let initCallData: string | undefined
+  })
+  let initAddress: Address | undefined = $state<Address | undefined>()
+  let initCallData: string | undefined = $state<string | undefined>()
 
-  let facetCuts: FacetCut[] = []
+  let facetCuts: FacetCut[] = $state([])
+
+  const getFunctionSelector = (m: AbiFunction) => {
+    if (m.name.indexOf('unknown_') > -1) {
+      return m.name.split('_')[1]
+    }
+    return toFunctionSelector(m)
+  }
+
+  // Initialize checkbox states for all facets
+  $effect(() => {
+    // Initialize for new facets
+    for (const f of newFacets) {
+      for (const m of abiMethods(f.abi)) {
+        const key = f.address.slice(0, 5) + getFunctionSelector(m)
+        if (!checkboxStates[key]) {
+          checkboxStates[key] = { checked: false }
+        }
+      }
+    }
+
+    // Initialize for existing facets
+    for (const f of diamond.facets) {
+      for (const m of abiMethods(f.abi)) {
+        const key = f.address.slice(0, 5) + getFunctionSelector(m)
+        const isDisabled = Object.values(strategy.replacements).some((r) =>
+          r.includes(getFunctionSelector(m)),
+        )
+        if (!checkboxStates[key]) {
+          checkboxStates[key] = { checked: false, disabled: isDisabled }
+        } else {
+          checkboxStates[key].disabled = isDisabled
+        }
+      }
+    }
+  })
 
   const buildCuts = () => {
     // Go through the strategy and build an array of fact cuts
@@ -147,9 +182,9 @@
         }
         strategy.removals[address] = [...strategy.removals[address], selector]
       } else {
-        strategy.removals[address] = strategy.removals[address].filter(
+        strategy.removals[address] = strategy.removals[address]?.filter(
           (r: string) => r !== selector,
-        )
+        ) ?? []
       }
     }
   }
@@ -177,11 +212,13 @@
           for (const [addr, removals] of Object.entries(strategy.removals)) {
             strategy.removals[addr as Address] = removals.filter((r: string) => {
               if (r !== selector) return true
-              checkboxes[addr.slice(0, 5) + selector].$set({ checked: false })
+              const key = addr.slice(0, 5) + selector
+              if (checkboxStates[key]) {
+                checkboxStates[key].checked = false
+              }
               return false
             })
           }
-          strategy = { ...strategy }
           return
         }
 
@@ -192,12 +229,10 @@
         strategy.additions[address] = strategy.additions[address].filter(
           (r: string) => r !== selector,
         )
-        strategy.replacements[address] = strategy.replacements[address].filter(
+        strategy.replacements[address] = strategy.replacements[address]?.filter(
           (r: string) => r !== selector,
-        )
+        ) ?? []
       }
-
-      strategy = { ...strategy }
     }
   }
 
@@ -242,12 +277,13 @@
 
   const toggleAllRemovals = (address: Address) => {
     return (checked: boolean | 'indeterminate' | undefined) => {
-      for (const [k, v] of Object.entries(checkboxes)) {
+      const boolChecked = checked === true || checked === 'indeterminate'
+      for (const [k, state] of Object.entries(checkboxStates)) {
         if (k.slice(0, 5) === address.slice(0, 5)) {
-          if (v.$$.ctx[2].disabled) continue
-          const upFn = updateRemovals(address, k.slice(-10))
-          const boolChecked = checked === true || checked === 'indeterminate'
-          v.$set({ checked: boolChecked })
+          if (state.disabled) continue
+          const selector = k.slice(-10)
+          const upFn = updateRemovals(address, selector)
+          state.checked = boolChecked
           upFn(boolChecked)
         }
       }
@@ -256,23 +292,17 @@
 
   const toggleAllAdditionsAndReplacements = (address: Address) => {
     return (checked: boolean | 'indeterminate' | undefined) => {
-      for (const [k, v] of Object.entries(checkboxes)) {
+      const boolChecked = checked === true || checked === 'indeterminate'
+      for (const [k, state] of Object.entries(checkboxStates)) {
         if (k.slice(0, 5) === address.slice(0, 5)) {
-          if (v.$$.ctx[2].disabled) continue
-          const upFn = updateAdditionsAndReplacements(address, k.slice(-10))
-          const boolChecked = checked === true || checked === 'indeterminate'
-          v.$set({ checked: boolChecked })
+          if (state.disabled) continue
+          const selector = k.slice(-10)
+          const upFn = updateAdditionsAndReplacements(address, selector)
+          state.checked = boolChecked
           upFn(boolChecked)
         }
       }
     }
-  }
-
-  const getFunctionSelector = (m: AbiFunction) => {
-    if (m.name.indexOf('unknown_') > -1) {
-      return m.name.split('_')[1]
-    }
-    return toFunctionSelector(m)
   }
 </script>
 
@@ -375,31 +405,34 @@
                 <Table.Cell><Badge variant="secondary">Toggle All</Badge></Table.Cell>
               </Table.Row>
               {#each abiMethods(f.abi) as m}
-                <Table.Row class="border-none">
-                  <Table.Cell class="text-left">
-                    <div>
-                      <Checkbox
-                        bind:this={checkboxes[f.address.slice(0, 5) + getFunctionSelector(m)]}
-                        onCheckedChange={updateAdditionsAndReplacements(
-                          f.address,
-                          getFunctionSelector(m),
-                        )}
-                      />
-                    </div>
-                  </Table.Cell>
-                  <Table.Cell class="font-medium text-left w-full text-lg">
-                    <div
-                      class:bg-green-500={strategy.additions[f.address] &&
-                        strategy.additions[f.address].includes(getFunctionSelector(m))}
-                      class:bg-yellow-500={strategy.replacements[f.address] &&
-                        strategy.replacements[f.address].includes(getFunctionSelector(m))}
-                      class="flex items-center p-1 rounded-md bg-opacity-90"
-                    >
-                      <Badge class="mr-2">{getFunctionSelector(m)}</Badge>
-                      {m.name}
-                    </div>
-                  </Table.Cell>
-                </Table.Row>
+                {@const checkboxKey = f.address.slice(0, 5) + getFunctionSelector(m)}
+                {#if checkboxStates[checkboxKey]}
+                  <Table.Row class="border-none">
+                    <Table.Cell class="text-left">
+                      <div>
+                        <Checkbox
+                          bind:checked={checkboxStates[checkboxKey].checked}
+                          onCheckedChange={updateAdditionsAndReplacements(
+                            f.address,
+                            getFunctionSelector(m),
+                          )}
+                        />
+                      </div>
+                    </Table.Cell>
+                    <Table.Cell class="font-medium text-left w-full text-lg">
+                      <div
+                        class:bg-green-500={strategy.additions[f.address] &&
+                          strategy.additions[f.address].includes(getFunctionSelector(m))}
+                        class:bg-yellow-500={strategy.replacements[f.address] &&
+                          strategy.replacements[f.address].includes(getFunctionSelector(m))}
+                        class="flex items-center p-1 rounded-md bg-opacity-90"
+                      >
+                        <Badge class="mr-2">{getFunctionSelector(m)}</Badge>
+                        {m.name}
+                      </div>
+                    </Table.Cell>
+                  </Table.Row>
+                {/if}
               {/each}
             </Table.Body>
           </Table.Root>
@@ -435,30 +468,34 @@
                 <Table.Cell><Badge variant="secondary">Toggle All</Badge></Table.Cell>
               </Table.Row>
               {#each abiMethods(f.abi) as m}
-                <Table.Row class="border-none">
-                  <Table.Cell class="text-left">
-                    <Checkbox
-                      bind:this={checkboxes[f.address.slice(0, 5) + getFunctionSelector(m)]}
-                      onCheckedChange={updateRemovals(f.address, getFunctionSelector(m))}
-                      disabled={Object.values(strategy.replacements).some((r) =>
-                        r.includes(getFunctionSelector(m)),
-                      )}
-                    />
-                  </Table.Cell>
-                  <Table.Cell class="font-medium text-left w-full text-lg">
-                    <div
-                      class:bg-red-500={strategy.removals[f.address] &&
-                        strategy.removals[f.address].includes(getFunctionSelector(m))}
-                      class:bg-yellow-500={Object.values(strategy.replacements).some((r) =>
-                        r.includes(getFunctionSelector(m)),
-                      )}
-                      class="flex items-center p-1 rounded-md bg-opacity-90"
-                    >
-                      <Badge class="mr-2">{getFunctionSelector(m)}</Badge>
-                      {m.name}
-                    </div>
-                  </Table.Cell>
-                </Table.Row>
+                {@const checkboxKey = f.address.slice(0, 5) + getFunctionSelector(m)}
+                {@const isDisabled = Object.values(strategy.replacements).some((r) =>
+                  r.includes(getFunctionSelector(m)),
+                )}
+                {#if checkboxStates[checkboxKey]}
+                  <Table.Row class="border-none">
+                    <Table.Cell class="text-left">
+                      <Checkbox
+                        bind:checked={checkboxStates[checkboxKey].checked}
+                        onCheckedChange={updateRemovals(f.address, getFunctionSelector(m))}
+                        disabled={isDisabled}
+                      />
+                    </Table.Cell>
+                    <Table.Cell class="font-medium text-left w-full text-lg">
+                      <div
+                        class:bg-red-500={strategy.removals[f.address] &&
+                          strategy.removals[f.address].includes(getFunctionSelector(m))}
+                        class:bg-yellow-500={Object.values(strategy.replacements).some((r) =>
+                          r.includes(getFunctionSelector(m)),
+                        )}
+                        class="flex items-center p-1 rounded-md bg-opacity-90"
+                      >
+                        <Badge class="mr-2">{getFunctionSelector(m)}</Badge>
+                        {m.name}
+                      </div>
+                    </Table.Cell>
+                  </Table.Row>
+                {/if}
               {/each}
             </Table.Body>
           </Table.Root>

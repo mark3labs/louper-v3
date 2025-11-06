@@ -26,8 +26,8 @@
   import { browser } from '$app/environment'
   import { goto } from '$app/navigation'
 
-  export let data: PageData
-  let selectedTab = $page.url.hash.replace('#', '') || 'facets'
+  let { data }: { data: PageData } = $props()
+  let selectedTab = $state($page.url.hash.replace('#', '') || 'facets')
 
   const chain: Chain = chainMap[data.chain]
 
@@ -65,9 +65,11 @@
     await disconnect()
   })
 
-  $: if ($connected && $chainId !== chain.id) {
-    switchChain($wagmiConfig, { chainId: chain.id }).catch(() => disconnectWagmi())
-  }
+  $effect(() => {
+    if ($connected && $chainId !== chain.id) {
+      switchChain($wagmiConfig, { chainId: chain.id }).catch(() => disconnectWagmi())
+    }
+  })
 </script>
 
 <div class="flex flex-col space-y-6">

@@ -1,8 +1,11 @@
 <script lang="ts">
   import { Collapsible as CollapsiblePrimitive } from 'bits-ui'
-  type $$Props = CollapsiblePrimitive.ContentProps
+  
+  type Props = CollapsiblePrimitive.ContentProps
+
+  let { ...restProps }: Props = $props()
 </script>
 
-<CollapsiblePrimitive.Content {...$$restProps}>
+<CollapsiblePrimitive.Content {...restProps}>
   <slot />
 </CollapsiblePrimitive.Content>

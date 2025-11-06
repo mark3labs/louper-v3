@@ -4,21 +4,23 @@
   import * as Collapsible from '$lib/components/ui/collapsible'
   import { Input } from '$lib/components/ui/input'
   import { Label } from '$lib/components/ui/label'
-  import * as Select from '$lib/components/ui/select'
+  import * as Popover from '$lib/components/ui/popover'
+  import * as Command from '$lib/components/ui/command'
   import * as Table from '$lib/components/ui/table'
   import type { ArgsResult, Diamond, FacetSelection } from '$lib/types'
-  import { abiMethods, copyToClipboard } from '$lib/utils'
+  import { abiMethods, copyToClipboard, cn } from '$lib/utils'
   import type { AbiFunction } from 'abitype'
-  import { ChevronsUpDown, Copy, CornerDownLeft, Loader2 } from '@lucide/svelte'
+  import { Check, ChevronsUpDown, Copy, CornerDownRight, Loader2 } from '@lucide/svelte'
   import { getContext } from 'svelte'
   import Tags from 'svelte-tags-input'
   import { type PublicClient, toFunctionSelector } from 'viem'
 
   const diamond = getContext<Diamond>('diamond')
   let activeAbi: AbiFunction[] = []
-  let selectedFacet: string
+  let selectedFacet: string | undefined = undefined
   let argsResults: ArgsResult[] = []
   let busy = false
+  let comboboxOpen = false
 
   const onFacetChange = (name: string | undefined) => {
     if (!name) return
@@ -26,6 +28,7 @@
     if (!facet) return
     activeAbi = facet.abi
     selectedFacet = facet.name
+    comboboxOpen = false
     for (const [idx] of Object(activeAbi).entries()) {
       argsResults[idx] = { args: [], result: null }
     }
@@ -79,16 +82,43 @@
         >{selectedFacet ?? 'Choose a facet to interact with.'}</Table.Head
       >
       <Table.Head class="flex items-center justify-end">
-        <Select.Root onSelectedChange={onFacetChange}>
-          <Select.Trigger class="w-[280px]">
-            {selectedFacet || 'Choose Facet'}
-          </Select.Trigger>
-          <Select.Content class="h-64 overflow-y-auto">
-            {#each facetsList as f}
-              <Select.Item value={f.name}>{f.name}</Select.Item>
-            {/each}
-          </Select.Content>
-        </Select.Root>
+        <Popover.Root bind:open={comboboxOpen} preventScroll>
+          <Popover.Trigger>
+            {#snippet child({ props }: { props: any })}
+              <Button
+                {...props}
+                variant="outline"
+                role="combobox"
+                aria-expanded={comboboxOpen}
+                class="w-[280px] justify-between"
+              >
+                {selectedFacet || 'Choose Facet'}
+                <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            {/snippet}
+          </Popover.Trigger>
+          <Popover.Content class="w-[280px] p-0">
+            <Command.Root>
+              <Command.Input placeholder="Search facets..." />
+              <Command.List>
+                <Command.Empty>No facet found.</Command.Empty>
+                <Command.Group>
+                  {#each facetsList as f}
+                    <Command.Item
+                      value={f.name}
+                      onSelect={() => onFacetChange(f.name)}
+                    >
+                      <Check
+                        class={cn('mr-2 h-4 w-4', selectedFacet !== f.name && 'text-transparent')}
+                      />
+                      {f.name}
+                    </Command.Item>
+                  {/each}
+                </Command.Group>
+              </Command.List>
+            </Command.Root>
+          </Popover.Content>
+        </Popover.Root>
       </Table.Head>
     </Table.Row>
   </Table.Header>
@@ -153,7 +183,7 @@
                   <Button type="submit" disabled={busy}>Query</Button>
                 </div>
                 <div class="flex items-center justify-start space-x-2">
-                  <CornerDownLeft />
+                  <CornerDownRight />
                   <div>
                     {m.outputs.reduce((a, o) => `${a}${o.name} ${o.type}, `, '').slice(0, -2)}
                   </div>

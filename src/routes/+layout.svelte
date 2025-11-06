@@ -14,9 +14,9 @@
   import { Button } from '$lib/components/ui/button'
   import * as Alert from '$lib/components/ui/alert'
 
-  let network: string | undefined
-  let address: Address | undefined
-  let searchOpen = false
+  let network: string | undefined = $state()
+  let address: Address | undefined = $state()
+  let searchOpen = $state(false)
 
   const chainOptions = Object.entries(chainMap).map(([key, chain]) => ({
     value: key,
@@ -24,7 +24,7 @@
   }))
   chainOptions.push({ value: 'ethereum', label: 'Ethereum' })
 
-  $: selectedValue = chainOptions.find((f) => f.value === network)?.label ?? 'Select a chain...'
+  let selectedValue = $derived(chainOptions.find((f) => f.value === network)?.label ?? 'Select a chain...')
 
   const gotoDiamond = () => {
     const networkParam = network === 'ethereum' ? 'mainnet' : network
