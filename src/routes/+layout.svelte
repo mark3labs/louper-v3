@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Toaster } from 'svelte-french-toast'
   import '../app.postcss'
-  import { Check, ChevronUp, MagnifyingGlass } from 'radix-icons-svelte'
+  import { Check, ChevronUp, Search, Terminal } from '@lucide/svelte'
   import type { Address } from 'viem'
   import { chainMap } from '$lib/chains'
   import * as Popover from '$lib/components/ui/popover'
@@ -13,7 +13,6 @@
   import { cn } from '$lib/utils'
   import { Button } from '$lib/components/ui/button'
   import * as Alert from '$lib/components/ui/alert'
-  import Terminal from 'lucide-svelte/icons/terminal'
 
   let network: string | undefined
   let address: Address | undefined
@@ -151,7 +150,7 @@
             </Popover.Root>
           </div>
           <button on:click={gotoDiamond}>
-            <MagnifyingGlass class="h-6 w-8" />
+            <Search class="h-6 w-8" />
           </button>
         </div>
       </div>

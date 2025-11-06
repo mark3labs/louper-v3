@@ -3,7 +3,7 @@
   import * as Dialog from '$lib/components/ui/dialog'
   import { Button } from '$lib/components/ui/button'
   import type { Diamond } from '$lib/types'
-  import { Copy, CaretSort, MagnifyingGlass, ExternalLink } from 'radix-icons-svelte'
+  import { Copy, ChevronsUpDown, Search, ExternalLink } from '@lucide/svelte'
   import { getContext } from 'svelte'
   import { copyToClipboard, abiMethods } from '$lib/utils'
   import * as Collapsible from '$lib/components/ui/collapsible'
@@ -48,12 +48,10 @@
         <Table.Cell class="w-1/2">
           <Collapsible.Root>
             <div class="flex items-center justify-start space-x-4">
-              <Badge variant="secondary" class="font-bold">
-                {abiMethods(f.abi).length} Methods
-              </Badge>
+              <h4 class="text-sm font-semibold">{f.abi.filter((m) => m.type === 'function').length}</h4>
               <Collapsible.Trigger asChild let:builder>
                 <Button builders={[builder]} variant="ghost" size="sm" class="w-9 p-0">
-                  <CaretSort class="h-4 w-4" />
+                  <ChevronsUpDown class="h-4 w-4" />
                   <span class="sr-only">Toggle</span>
                 </Button>
               </Collapsible.Trigger>
@@ -104,8 +102,8 @@
         </Table.Cell>
         <Table.Cell class="text-center">
           <Dialog.Root>
-            <Dialog.Trigger>
-              <MagnifyingGlass />
+            <Dialog.Trigger            >
+              <Search />
             </Dialog.Trigger>
             <Dialog.Content class="min-w-fit">
               <Dialog.Header>

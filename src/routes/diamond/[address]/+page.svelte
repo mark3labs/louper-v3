@@ -5,7 +5,7 @@
   import * as Tabs from '$lib/components/ui/tabs'
   import { copyToClipboard } from '$lib/utils'
   import { switchChain } from '@wagmi/core'
-  import { Copy, ExternalLink, MagnifyingGlass } from 'radix-icons-svelte'
+  import { Copy, ExternalLink, Search } from '@lucide/svelte'
   import { onDestroy, onMount, setContext } from 'svelte'
   import {
     chainId,
@@ -95,7 +95,7 @@
           class="inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <span>View Diamond ABI</span>
-          <MagnifyingGlass />
+          <Search />
         </Dialog.Trigger>
         <Dialog.Content class="min-w-fit">
           <Dialog.Header>
