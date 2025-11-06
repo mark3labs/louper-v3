@@ -1,17 +1,17 @@
 <!-- 
 Sync Impact Report:
-Version Change: NEW → 1.0.0 (Initial constitution ratification)
-Modified Principles: None (initial creation)
-Added Sections: All sections newly defined
-Removed Sections: None
+Version Change: 1.0.0 → 2.0.0 (Removed Performance and Scalability principle)
+Modified Principles: Removed Principle V (Performance and Scalability)
+Added Sections: None
+Removed Sections: Core Principle V, performance references in Code Review Requirements
 Templates requiring updates: 
-  ✅ Constitution created
-  ⚠ .specify/templates/plan-template.md (pending review)
-  ⚠ .specify/templates/spec-template.md (pending review)
-  ⚠ .specify/templates/tasks-template.md (pending review)
+  ✅ Constitution updated
+  ⚠ .specify/templates/plan-template.md (pending review - remove performance checks)
+  ⚠ .specify/templates/spec-template.md (pending review - remove performance requirements)
+  ⚠ .specify/templates/tasks-template.md (pending review - remove performance tasks)
 Follow-up TODOs: 
-  - Confirm ratification date with project maintainers
-  - Review all templates for alignment with new principles
+  - Update all active specs to remove performance requirements
+  - Review templates for performance-related content
 -->
 
 # Louper Constitution
@@ -46,18 +46,11 @@ diamond structures MUST be visualized in an intuitive, navigable format.
 API responses MUST be consistent, well-documented, and versioned to prevent 
 breaking changes for integrators.
 
-### V. Performance and Scalability
-The application MUST handle large diamond contracts with hundreds of facets 
-without degradation. Database queries SHALL be optimized and indexed for 
-common access patterns. Frontend rendering MUST remain responsive even with 
-extensive facet data. Caching strategies MUST be employed for frequently 
-accessed blockchain data while ensuring data freshness.
-
 ## Technical Standards
 
 ### Web Stack Requirements
 - Frontend: SvelteKit with TypeScript for type safety
-- Runtime: Bun for optimal JavaScript performance
+- Runtime: Bun for JavaScript execution
 - Blockchain: Wagmi/Viem for reliable Web3 interactions
 - Database: Drizzle ORM with proper migrations
 - Styling: Component-based UI with consistent design system
@@ -84,7 +77,6 @@ accessed blockchain data while ensuring data freshness.
 - Minimum one approval required before merge
 - Automated CI checks MUST pass (linting, tests, build)
 - Security vulnerabilities MUST be addressed before approval
-- Performance impact SHALL be assessed for data-heavy changes
 
 ## Governance
 
@@ -107,4 +99,4 @@ migration plans for existing code.
 - Quarterly audits SHALL assess adherence to principles
 - Violations MUST be tracked and remediated within one release cycle
 
-**Version**: 1.0.0 | **Ratified**: TODO(RATIFICATION_DATE): Awaiting confirmation from maintainers | **Last Amended**: 2025-01-06
+**Version**: 2.0.0 | **Ratified**: TODO(RATIFICATION_DATE): Awaiting confirmation from maintainers | **Last Amended**: 2025-11-06

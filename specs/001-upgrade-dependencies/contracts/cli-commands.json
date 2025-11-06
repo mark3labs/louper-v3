@@ -1,0 +1,255 @@
+{
+  "name": "dependency-upgrade-cli",
+  "version": "1.0.0",
+  "description": "CLI commands for framework and dependency upgrade",
+  "commands": [
+    {
+      "name": "validate",
+      "description": "Validate the project is ready for migration",
+      "usage": "bun run migrate:validate",
+      "options": [
+        {
+          "flag": "--check",
+          "description": "Specific check to run",
+          "values": ["git", "tests", "build", "audit", "all"],
+          "default": "all"
+        },
+        {
+          "flag": "--verbose",
+          "description": "Show detailed output",
+          "type": "boolean",
+          "default": false
+        }
+      ],
+      "output": {
+        "success": {
+          "exitCode": 0,
+          "message": "✅ All validation checks passed"
+        },
+        "failure": {
+          "exitCode": 1,
+          "message": "❌ Validation failed: {details}"
+        }
+      }
+    },
+    {
+      "name": "backup",
+      "description": "Create backup before migration",
+      "usage": "bun run migrate:backup",
+      "options": [
+        {
+          "flag": "--output",
+          "description": "Backup output directory",
+          "type": "string",
+          "default": ".backup/pre-migration"
+        }
+      ],
+      "output": {
+        "success": {
+          "exitCode": 0,
+          "message": "✅ Backup created at {path}"
+        },
+        "failure": {
+          "exitCode": 1,
+          "message": "❌ Backup failed: {error}"
+        }
+      }
+    },
+    {
+      "name": "upgrade-core",
+      "description": "Upgrade core framework packages",
+      "usage": "bun run migrate:upgrade-core",
+      "options": [
+        {
+          "flag": "--dry-run",
+          "description": "Show what would be upgraded without making changes",
+          "type": "boolean",
+          "default": false
+        }
+      ],
+      "script": "bun install svelte@^5.43.3 @sveltejs/kit@^2.48.4 @sveltejs/vite-plugin-svelte@^6.2.1 vite@^5.4.21 -D",
+      "output": {
+        "success": {
+          "exitCode": 0,
+          "message": "✅ Core packages upgraded successfully"
+        },
+        "failure": {
+          "exitCode": 1,
+          "message": "❌ Core upgrade failed: {error}"
+        }
+      }
+    },
+    {
+      "name": "migrate-svelte",
+      "description": "Run Svelte 5 migration",
+      "usage": "bun run migrate:svelte",
+      "options": [
+        {
+          "flag": "--interactive",
+          "description": "Run in interactive mode",
+          "type": "boolean",
+          "default": false
+        }
+      ],
+      "script": "bun x sv migrate svelte-5",
+      "output": {
+        "success": {
+          "exitCode": 0,
+          "message": "✅ Svelte 5 migration completed"
+        },
+        "failure": {
+          "exitCode": 1,
+          "message": "❌ Svelte migration failed: {error}"
+        }
+      }
+    },
+    {
+      "name": "update-deps",
+      "description": "Update all dependencies to target versions",
+      "usage": "bun run migrate:update-deps",
+      "options": [],
+      "script": "bun install bits-ui@^2.14.2 @lucide/svelte@latest tailwindcss-animate -D && bun remove cmdk-sv lucide-svelte radix-icons-svelte",
+      "output": {
+        "success": {
+          "exitCode": 0,
+          "message": "✅ Dependencies updated successfully"
+        },
+        "failure": {
+          "exitCode": 1,
+          "message": "❌ Dependency update failed: {error}"
+        }
+      }
+    },
+    {
+      "name": "regenerate-components",
+      "description": "Regenerate shadcn-svelte components",
+      "usage": "bun run migrate:regenerate-components",
+      "options": [
+        {
+          "flag": "--component",
+          "description": "Specific component to regenerate",
+          "type": "string"
+        },
+        {
+          "flag": "--all",
+          "description": "Regenerate all components",
+          "type": "boolean",
+          "default": false
+        }
+      ],
+      "script": "bun x shadcn-svelte@latest add {component} --overwrite",
+      "output": {
+        "success": {
+          "exitCode": 0,
+          "message": "✅ Components regenerated successfully"
+        },
+        "failure": {
+          "exitCode": 1,
+          "message": "❌ Component regeneration failed: {error}"
+        }
+      }
+    },
+    {
+      "name": "test",
+      "description": "Run tests after migration",
+      "usage": "bun run migrate:test",
+      "options": [
+        {
+          "flag": "--type",
+          "description": "Test type to run",
+          "values": ["check", "build", "dev", "all"],
+          "default": "all"
+        }
+      ],
+      "scripts": {
+        "check": "bun run check",
+        "build": "bun --bun run build",
+        "dev": "timeout 30 bun --bun run dev",
+        "all": "bun run check && bun --bun run build"
+      },
+      "output": {
+        "success": {
+          "exitCode": 0,
+          "message": "✅ All tests passed"
+        },
+        "failure": {
+          "exitCode": 1,
+          "message": "❌ Tests failed: {error}"
+        }
+      }
+    },
+    {
+      "name": "rollback",
+      "description": "Rollback migration to previous state",
+      "usage": "bun run migrate:rollback",
+      "options": [
+        {
+          "flag": "--backup",
+          "description": "Backup directory to restore from",
+          "type": "string",
+          "default": ".backup/pre-migration"
+        },
+        {
+          "flag": "--confirm",
+          "description": "Skip confirmation prompt",
+          "type": "boolean",
+          "default": false
+        }
+      ],
+      "output": {
+        "success": {
+          "exitCode": 0,
+          "message": "✅ Successfully rolled back to {backup}"
+        },
+        "failure": {
+          "exitCode": 1,
+          "message": "❌ Rollback failed: {error}"
+        }
+      }
+    },
+    {
+      "name": "migrate",
+      "description": "Run complete migration process",
+      "usage": "bun run migrate",
+      "options": [
+        {
+          "flag": "--phase",
+          "description": "Start from specific phase",
+          "values": ["validate", "backup", "core", "svelte", "deps", "components", "test"],
+          "default": "validate"
+        },
+        {
+          "flag": "--auto",
+          "description": "Run without prompts",
+          "type": "boolean",
+          "default": false
+        }
+      ],
+      "script": "bun run migrate:validate && bun run migrate:backup && bun run migrate:upgrade-core && bun run migrate:svelte && bun run migrate:update-deps && bun run migrate:regenerate-components && bun run migrate:test",
+      "output": {
+        "success": {
+          "exitCode": 0,
+          "message": "✅ Migration completed successfully"
+        },
+        "failure": {
+          "exitCode": 1,
+          "message": "❌ Migration failed at phase {phase}: {error}"
+        }
+      }
+    }
+  ],
+  "packageScripts": {
+    "description": "Add these scripts to package.json",
+    "scripts": {
+      "migrate": "bun run migrate:validate && bun run migrate:backup && bun run migrate:upgrade-core && bun run migrate:svelte && bun run migrate:update-deps && bun run migrate:regenerate-components && bun run migrate:test",
+      "migrate:validate": "echo 'Validating migration readiness...' && git status --porcelain | grep -q . && echo '❌ Git working directory not clean' && exit 1 || echo '✅ Git status clean'",
+      "migrate:backup": "cp -r . .backup/pre-migration-$(date +%Y%m%d-%H%M%S)",
+      "migrate:upgrade-core": "bun install svelte@^5.43.3 @sveltejs/kit@^2.48.4 @sveltejs/vite-plugin-svelte@^6.2.1 vite@^5.4.21 -D",
+      "migrate:svelte": "bun x sv migrate svelte-5",
+      "migrate:update-deps": "bun install bits-ui@^2.14.2 @lucide/svelte@latest tailwindcss-animate -D && bun remove cmdk-sv lucide-svelte radix-icons-svelte",
+      "migrate:regenerate-components": "bun x shadcn-svelte@latest add --all --overwrite",
+      "migrate:test": "bun run check && bun --bun run build",
+      "migrate:rollback": "echo 'Rolling back migration...' && rm -rf node_modules package.json bun.lockb && cp -r .backup/pre-migration/* . && bun install"
+    }
+  }
+}

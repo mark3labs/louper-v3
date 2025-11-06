@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Toaster } from 'svelte-french-toast'
   import '../app.postcss'
-  import { Check, ChevronUp, MagnifyingGlass } from 'radix-icons-svelte'
+  import { Check, ChevronUp, Search, Terminal } from '@lucide/svelte'
   import type { Address } from 'viem'
   import { chainMap } from '$lib/chains'
   import * as Popover from '$lib/components/ui/popover'
@@ -13,11 +13,17 @@
   import { cn } from '$lib/utils'
   import { Button } from '$lib/components/ui/button'
   import * as Alert from '$lib/components/ui/alert'
-  import Terminal from 'lucide-svelte/icons/terminal'
+  import type { Snippet } from 'svelte'
 
-  let network: string | undefined
-  let address: Address | undefined
-  let searchOpen = false
+  let {
+    children
+  }: {
+    children: Snippet
+  } = $props()
+
+  let network: string | undefined = $state()
+  let address: Address | undefined = $state()
+  let searchOpen = $state(false)
 
   const chainOptions = Object.entries(chainMap).map(([key, chain]) => ({
     value: key,
@@ -25,7 +31,7 @@
   }))
   chainOptions.push({ value: 'ethereum', label: 'Ethereum' })
 
-  $: selectedValue = chainOptions.find((f) => f.value === network)?.label ?? 'Select a chain...'
+  let selectedValue = $derived(chainOptions.find((f) => f.value === network)?.label ?? 'Select a chain...')
 
   const gotoDiamond = () => {
     const networkParam = network === 'ethereum' ? 'mainnet' : network
@@ -59,7 +65,7 @@
     <img src="/img/louper-logo.png" alt="Louper - The Ethereum Diamond Inspector" class="h-12" />
     <h2 class="ml-2 text-lg font-bold text-primary">Louper - The Ethereum Diamond Inspector</h2>
   </nav>
-  <nav class="flex flex-row items-center p-2" />
+  <nav class="flex flex-row items-center p-2"></nav>
 </div>
 
 <div class="pt-20 container max-w-2xl">
@@ -113,45 +119,49 @@
             />
           </div>
           <div>
-            <Popover.Root bind:open={searchOpen} let:ids preventScroll>
-              <Popover.Trigger asChild let:builder>
-                <Button
-                  builders={[builder]}
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={searchOpen}
-                  class="w-[200px] justify-between"
-                >
-                  {selectedValue}
-                  <ChevronUp class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
+            <Popover.Root bind:open={searchOpen}>
+              <Popover.Trigger>
+                {#snippet child({ props }: { props: any })}
+                  <Button
+                    {...props}
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={searchOpen}
+                    class="w-[200px] justify-between"
+                  >
+                    {selectedValue}
+                    <ChevronUp class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                {/snippet}
               </Popover.Trigger>
-              <Popover.Content class="w-[200px] p-0 h-96">
+              <Popover.Content class="w-[200px] p-0">
                 <Command.Root>
                   <Command.Input placeholder="Search chains..." />
-                  <Command.Empty>No chain found.</Command.Empty>
-                  <Command.Group>
-                    {#each chainOptions as chain}
-                      <Command.Item
-                        value={chain.value}
-                        onSelect={(currentValue) => {
-                          network = currentValue
-                          closeAndFocusTrigger(ids.trigger)
-                        }}
-                      >
-                        <Check
-                          class={cn('mr-2 h-4 w-4', network !== chain.value && 'text-transparent')}
-                        />
-                        {chain.label}
-                      </Command.Item>
-                    {/each}
-                  </Command.Group>
+                  <Command.List>
+                    <Command.Empty>No chain found.</Command.Empty>
+                    <Command.Group>
+                      {#each chainOptions as chain}
+                        <Command.Item
+                          value={chain.value}
+                          onSelect={() => {
+                            network = chain.value
+                            searchOpen = false
+                          }}
+                        >
+                          <Check
+                            class={cn('mr-2 h-4 w-4', network !== chain.value && 'text-transparent')}
+                          />
+                          {chain.label}
+                        </Command.Item>
+                      {/each}
+                    </Command.Group>
+                  </Command.List>
                 </Command.Root>
               </Popover.Content>
             </Popover.Root>
           </div>
-          <button on:click={gotoDiamond}>
-            <MagnifyingGlass class="h-6 w-8" />
+          <button onclick={gotoDiamond}>
+            <Search class="h-6 w-8" />
           </button>
         </div>
       </div>
@@ -167,7 +177,7 @@
           <span class="text-xl font-bold text-primary">Loading...</span>
         </div>
       {:else}
-        <slot />
+        {@render children()}
       {/if}
     </div>
   </div>

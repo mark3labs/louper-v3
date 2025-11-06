@@ -5,8 +5,9 @@
   import * as Tabs from '$lib/components/ui/tabs'
   import { copyToClipboard } from '$lib/utils'
   import { switchChain } from '@wagmi/core'
-  import { Copy, ExternalLink, MagnifyingGlass } from 'radix-icons-svelte'
+  import { Copy, ExternalLink, Search } from '@lucide/svelte'
   import { onDestroy, onMount, setContext } from 'svelte'
+  import { pushState } from '$app/navigation'
   import {
     chainId,
     connected,
@@ -25,8 +26,8 @@
   import { browser } from '$app/environment'
   import { goto } from '$app/navigation'
 
-  export let data: PageData
-  let selectedTab = $page.url.hash.replace('#', '') || 'facets'
+  let { data }: { data: PageData } = $props()
+  let selectedTab = $state($page.url.hash.replace('#', '') || 'facets')
 
   const chain: Chain = chainMap[data.chain]
 
@@ -64,9 +65,11 @@
     await disconnect()
   })
 
-  $: if ($connected && $chainId !== chain.id) {
-    switchChain($wagmiConfig, { chainId: chain.id }).catch(() => disconnectWagmi())
-  }
+  $effect(() => {
+    if ($connected && $chainId !== chain.id) {
+      switchChain($wagmiConfig, { chainId: chain.id }).catch(() => disconnectWagmi())
+    }
+  })
 </script>
 
 <div class="flex flex-col space-y-6">
@@ -74,7 +77,7 @@
     <p class="text-4xl text-primary font-bold">{data.diamond.name}</p>
     <p class="text-xl text-muted-foreground font-bold">
       {data.diamond.address}
-      <Button variant="ghost" on:click={() => copyToClipboard(data.diamond.address)} class="p-1">
+      <Button variant="ghost" onclick={() => copyToClipboard(data.diamond.address)} class="p-1">
         <Copy />
       </Button>
       <Button
@@ -95,7 +98,7 @@
           class="inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <span>View Diamond ABI</span>
-          <MagnifyingGlass />
+          <Search />
         </Dialog.Trigger>
         <Dialog.Content class="min-w-fit">
           <Dialog.Header>
@@ -111,7 +114,7 @@
                 <Button
                   variant="ghost"
                   class="absolute top-3 right-3"
-                  on:click={() => copyToClipboard(JSON.stringify(data.diamondAbi))}
+                  onclick={() => copyToClipboard(JSON.stringify(data.diamondAbi))}
                 >
                   <Copy />
                 </Button>
@@ -123,11 +126,11 @@
     </div>
     <Tabs.Root bind:value={selectedTab} class="w-full">
       <Tabs.List class="mb-5">
-        <Tabs.Trigger value="facets" on:click={disconnect}>Facets</Tabs.Trigger>
-        <Tabs.Trigger value="history" on:click={disconnect}>History</Tabs.Trigger>
-        <Tabs.Trigger value="read" on:click={disconnect}>Read</Tabs.Trigger>
-        <Tabs.Trigger value="write" on:click={disconnect}>Write</Tabs.Trigger>
-        <Tabs.Trigger value="edit" on:click={disconnect}>Edit</Tabs.Trigger>
+        <Tabs.Trigger value="facets" onclick={disconnect}>Facets</Tabs.Trigger>
+        <Tabs.Trigger value="history" onclick={disconnect}>History</Tabs.Trigger>
+        <Tabs.Trigger value="read" onclick={disconnect}>Read</Tabs.Trigger>
+        <Tabs.Trigger value="write" onclick={disconnect}>Write</Tabs.Trigger>
+        <Tabs.Trigger value="edit" onclick={disconnect}>Edit</Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content value="facets" class="border rounded-[0.5rem] p-5">
         <FacetsTable />

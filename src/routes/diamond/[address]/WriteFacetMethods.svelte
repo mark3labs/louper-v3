@@ -4,14 +4,15 @@
   import * as Collapsible from '$lib/components/ui/collapsible'
   import { Input } from '$lib/components/ui/input'
   import { Label } from '$lib/components/ui/label'
-  import * as Select from '$lib/components/ui/select'
+  import * as Popover from '$lib/components/ui/popover'
+  import * as Command from '$lib/components/ui/command'
   import * as Table from '$lib/components/ui/table'
   import { connected, wagmiConfig, isUsingSafe } from '$lib/stores/wagmi'
   import type { ArgsResult, Diamond, FacetSelection } from '$lib/types'
-  import { abiMethods, copyToClipboard, sleep } from '$lib/utils'
+  import { abiMethods, copyToClipboard, sleep, cn } from '$lib/utils'
   import { getWalletClient, waitForTransactionReceipt } from '@wagmi/core'
   import type { AbiFunction } from 'abitype'
-  import { CaretSort, Copy, SketchLogo } from 'radix-icons-svelte'
+  import { Check, ChevronsUpDown, Copy, Loader2 } from '@lucide/svelte'
   import { getContext } from 'svelte'
   import Tags from 'svelte-tags-input'
   import { parseEther, toFunctionSelector, type Hash, type WriteContractReturnType } from 'viem'
@@ -22,14 +23,18 @@
   const diamond = getContext<Diamond>('diamond')
   const chain = getContext<Chain>('chain')
   let activeAbi: AbiFunction[] = []
-  let selectedFacet: string
+  let selectedFacet: string | undefined = undefined
   let argsResults: ArgsResult[] = []
   let busy = false
+  let comboboxOpen = false
 
-  const onFacetChange = (s: unknown) => {
-    const selection = <FacetSelection>s
-    activeAbi = selection.value
-    selectedFacet = selection.label
+  const onFacetChange = (name: string | undefined) => {
+    if (!name) return
+    const facet = facetsList.find(f => f.name === name)
+    if (!facet) return
+    activeAbi = facet.abi
+    selectedFacet = facet.name
+    comboboxOpen = false
     for (const [idx] of Object(activeAbi).entries()) {
       argsResults[idx] = { args: [], result: null, error: undefined }
     }
@@ -116,16 +121,43 @@
         {selectedFacet ?? 'Choose a facet to interact with.'}
       </Table.Head>
       <Table.Head class="flex items-center justify-end">
-        <Select.Root onSelectedChange={onFacetChange}>
-          <Select.Trigger class="w-[280px]">
-            <Select.Value placeholder="Choose Facet" />
-          </Select.Trigger>
-          <Select.Content class="h-64 overflow-y-auto">
-            {#each facetsList as f}
-              <Select.Item value={f.abi}>{f.name}</Select.Item>
-            {/each}
-          </Select.Content>
-        </Select.Root>
+        <Popover.Root bind:open={comboboxOpen}>
+          <Popover.Trigger>
+            {#snippet child({ props }: { props: any })}
+              <Button
+                {...props}
+                variant="outline"
+                role="combobox"
+                aria-expanded={comboboxOpen}
+                class="w-[280px] justify-between"
+              >
+                {selectedFacet || 'Choose Facet'}
+                <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            {/snippet}
+          </Popover.Trigger>
+          <Popover.Content class="w-[280px] p-0">
+            <Command.Root>
+              <Command.Input placeholder="Search facets..." />
+              <Command.List>
+                <Command.Empty>No facet found.</Command.Empty>
+                <Command.Group>
+                  {#each facetsList as f}
+                    <Command.Item
+                      value={f.name}
+                      onSelect={() => onFacetChange(f.name)}
+                    >
+                      <Check
+                        class={cn('mr-2 h-4 w-4', selectedFacet !== f.name && 'text-transparent')}
+                      />
+                      {f.name}
+                    </Command.Item>
+                  {/each}
+                </Command.Group>
+              </Command.List>
+            </Command.Root>
+          </Popover.Content>
+        </Popover.Root>
       </Table.Head>
     </Table.Row>
   </Table.Header>
@@ -140,21 +172,23 @@
                   <span class="font-medium leading-none text-2xl text-primary">
                     {m.name}
                   </span>
-                  <Collapsible.Trigger asChild let:builder>
-                    <Button
-                      builders={[builder]}
-                      variant="ghost"
-                      size="sm"
-                      class="p-0 uppercase mx-2"
-                    >
-                      <CaretSort class="h-4 w-4 mr-2" />
-                      <span class="text-muted-foreground">Expand</span>
-                    </Button>
+                  <Collapsible.Trigger>
+                    {#snippet child({ props }: { props: any })}
+                      <Button
+                        {...props}
+                        variant="ghost"
+                        size="sm"
+                        class="p-0 uppercase mx-2"
+                      >
+                        <ChevronsUpDown class="h-4 w-4 mr-2" />
+                        <span class="text-muted-foreground">Expand</span>
+                      </Button>
+                    {/snippet}
                   </Collapsible.Trigger>
                 </p>
                 <p class="text-lg text-muted-foreground">
                   {toFunctionSelector(m)}
-                  <Button variant="ghost" on:click={() => copyToClipboard(toFunctionSelector(m))}>
+                  <Button variant="ghost" onclick={() => copyToClipboard(toFunctionSelector(m))}>
                     <Copy />
                   </Button>
                 </p>
@@ -162,7 +196,7 @@
             </div>
             <Collapsible.Content class="p-5 flex flex-col space-y-3">
               <form
-                on:submit|preventDefault={() => writeContract(idx)}
+                onsubmit={(e) => { e.preventDefault(); writeContract(idx); }}
                 class="flex flex-col space-y-3"
               >
                 {#if m.stateMutability === 'payable'}
@@ -180,7 +214,7 @@
                   <div class="grid w-full max-w-xl items-center gap-1.5">
                     <Label>{input.name ?? 'var'} ({input.type})</Label>
                     {#if input.type === 'bool'}
-                      <Checkbox bind:checked={argsResults[idx].args[i]} />
+                      <Checkbox checked={!!argsResults[idx].args[i]} onCheckedChange={(v) => argsResults[idx].args[i] = (v === true) as any} />
                     {:else if input.type.indexOf('[') > -1 && input.type.indexOf(']') > -1}
                       <div class="tags-input">
                         <Tags bind:tags={argsResults[idx].args[i]} allowPaste />
@@ -201,8 +235,8 @@
               </form>
               {#if busy}
                 <div class="flex items-center justify-start">
-                  <SketchLogo color="#6D28D9" class="mr-2 animate-spin h-6 w-6" />
-                  <span class="text-lg text-muted-foreground">Loading...<span /></span>
+                  <Loader2 color="#6D28D9" class="mr-2 animate-spin h-6 w-6" />
+                  <span class="text-lg text-muted-foreground">Loading...</span>
                 </div>
               {/if}
               {#if argsResults[idx].result !== undefined && argsResults[idx].result !== null}
