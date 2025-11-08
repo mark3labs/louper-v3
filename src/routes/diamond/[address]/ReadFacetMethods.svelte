@@ -29,8 +29,17 @@
     activeAbi = facet.abi
     selectedFacet = facet.name
     comboboxOpen = false
-    for (const [idx] of Object(activeAbi).entries()) {
-      argsResults[idx] = { args: [], result: null }
+    for (const [idx, method] of Object(activeAbi).entries()) {
+      argsResults[idx] = {
+        args: method.inputs.map((input) => {
+          // Initialize array types with empty array
+          if (input.type.indexOf('[') > -1 && input.type.indexOf(']') > -1) {
+            return []
+          }
+          return undefined
+        }),
+        result: null,
+      }
     }
   }
 

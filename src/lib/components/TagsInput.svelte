@@ -18,6 +18,10 @@
   let inputValue = $state('')
 
   function addTag(tag: string) {
+    // Ensure tags is always an array
+    if (!tags) {
+      tags = []
+    }
     const trimmed = tag.trim()
     if (trimmed && !tags.includes(trimmed)) {
       tags = [...tags, trimmed]
@@ -25,6 +29,7 @@
   }
 
   function removeTag(index: number) {
+    if (!tags) return
     tags = tags.filter((_, i) => i !== index)
   }
 
@@ -35,7 +40,7 @@
         addTag(inputValue)
         inputValue = ''
       }
-    } else if (e.key === 'Backspace' && !inputValue && tags.length > 0) {
+    } else if (e.key === 'Backspace' && !inputValue && tags && tags.length > 0) {
       removeTag(tags.length - 1)
     }
   }
@@ -66,7 +71,7 @@
     className,
   )}
 >
-  {#each tags as tag, i}
+  {#each tags || [] as tag, i}
     <span
       class="svelte-tags-input-tag inline-flex items-center gap-1 rounded-md bg-primary px-2 py-1 text-xs font-medium text-primary-foreground"
     >
