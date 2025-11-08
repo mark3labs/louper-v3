@@ -14,7 +14,6 @@
         "consola": "^3.4.2",
         "drizzle-orm": "^0.44.7",
         "svelte-french-toast": "^1.2.0",
-        "svelte-tags-input": "^6.0.2",
         "tailwind-merge": "^3.3.1",
         "tailwind-variants": "^3.1.1",
         "viem": "^2.38.6",
@@ -1614,8 +1613,6 @@
     "svelte-french-toast": ["svelte-french-toast@1.2.0", "", { "dependencies": { "svelte-writable-derived": "^3.1.0" }, "peerDependencies": { "svelte": "^3.57.0 || ^4.0.0" } }, "sha512-5PW+6RFX3xQPbR44CngYAP1Sd9oCq9P2FOox4FZffzJuZI2mHOB7q5gJBVnOiLF5y3moVGZ7u2bYt7+yPAgcEQ=="],
 
     "svelte-sonner": ["svelte-sonner@1.0.5", "", { "dependencies": { "runed": "^0.28.0" }, "peerDependencies": { "svelte": "^5.0.0" } }, "sha512-9dpGPFqKb/QWudYqGnEz93vuY+NgCEvyNvxoCLMVGw6sDN/3oVeKV1xiEirW2E1N3vJEyj5imSBNOGltQHA7mg=="],
-
-    "svelte-tags-input": ["svelte-tags-input@6.0.2", "", {}, "sha512-TKEuSk9qPTbEXs2Q1njatpYHDmGaK4kshr2W3xi6fZeHMACDr1USV+Yo0DF+1s2adzY4OIRxpGzfCb8n3aQduQ=="],
 
     "svelte-toolbelt": ["svelte-toolbelt@0.5.0", "", { "dependencies": { "clsx": "^2.1.1", "style-to-object": "^1.0.8" }, "peerDependencies": { "svelte": "^5.0.0-next.126" } }, "sha512-t3tenZcnfQoIeRuQf/jBU7bvTeT3TGkcEE+1EUr5orp0lR7NEpprflpuie3x9Dn0W9nOKqs3HwKGJeeN5Ok1sQ=="],
 
