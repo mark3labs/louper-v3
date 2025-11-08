@@ -14,9 +14,10 @@
   import { Button } from '$lib/components/ui/button'
   import * as Alert from '$lib/components/ui/alert'
   import type { Snippet } from 'svelte'
+  import SponsorSlots from './SponsorSlots.svelte'
 
   let {
-    children
+    children,
   }: {
     children: Snippet
   } = $props()
@@ -31,7 +32,9 @@
   }))
   chainOptions.push({ value: 'ethereum', label: 'Ethereum' })
 
-  let selectedValue = $derived(chainOptions.find((f) => f.value === network)?.label ?? 'Select a chain...')
+  let selectedValue = $derived(
+    chainOptions.find((f) => f.value === network)?.label ?? 'Select a chain...',
+  )
 
   const gotoDiamond = () => {
     const networkParam = network === 'ethereum' ? 'mainnet' : network
@@ -77,7 +80,11 @@
     </Alert.Description>
   </Alert.Root>
 </div>
-<div class="container pt-10">
+
+<div class="container my-5">
+  <SponsorSlots />
+</div>
+<div class="container">
   <div class="my-24 rounded-[0.5rem] border shadow-sm shadow-primary">
     <div class="border-b">
       <div class="flex h-16 items-center p-5">
@@ -149,7 +156,10 @@
                           }}
                         >
                           <Check
-                            class={cn('mr-2 h-4 w-4', network !== chain.value && 'text-transparent')}
+                            class={cn(
+                              'mr-2 h-4 w-4',
+                              network !== chain.value && 'text-transparent',
+                            )}
                           />
                           {chain.label}
                         </Command.Item>

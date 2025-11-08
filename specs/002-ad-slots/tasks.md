@@ -29,8 +29,8 @@ description: "Task list for Advertisement Slots feature implementation"
 
 **Purpose**: Prepare static assets needed for sponsor slots
 
-- [ ] T001 Create placeholder logo image at static/img/sponsor-placeholder.png (200x200px, PNG format)
-- [ ] T002 [P] Verify existing sponsor logos in static/img/ directory (quicknode-logo.svg, mark3labslogo.png, gelato-logo.png, lifi.png)
+- [X] T001 Create placeholder logo image at static/img/sponsor-placeholder.png (200x200px, PNG format)
+- [X] T002 [P] Verify existing sponsor logos in static/img/ directory (quicknode-logo.svg, mark3labslogo.png, gelato-logo.png, lifi.png)
 
 **Checkpoint**: All required image assets are in place
 
@@ -52,18 +52,18 @@ description: "Task list for Advertisement Slots feature implementation"
 
 ### Implementation for User Story 1
 
-- [ ] T003 [US1] Create Sponsor interface inline in src/routes/SponsorSlots.svelte (name, description, logo, tier fields)
-- [ ] T004 [US1] Create sponsors static data array with 5 placeholder entries in src/routes/SponsorSlots.svelte
-- [ ] T005 [US1] Implement SponsorSlots component layout with grid container (grid gap-4 md:grid-cols-2 lg:grid-cols-3) in src/routes/SponsorSlots.svelte
-- [ ] T006 [US1] Implement sponsor card layout with left logo container (aspect-square) in src/routes/SponsorSlots.svelte
-- [ ] T007 [US1] Implement sponsor card text content (title and description with line-clamp-3) in src/routes/SponsorSlots.svelte
-- [ ] T008 [US1] Implement image fallback handling with $state rune and onerror handler in src/routes/SponsorSlots.svelte
-- [ ] T009 [US1] Apply CSS classes for 1:1 aspect ratio and center cropping (object-cover object-center) in src/routes/SponsorSlots.svelte
-- [ ] T010 [US1] Import and render SponsorSlots component in src/routes/+page.svelte above Featured component
-- [ ] T011 [US1] Verify 5 sponsor slots display correctly on main page with placeholder content
-- [ ] T012 [US1] Test image fallback by using invalid logo path and verifying placeholder displays
-- [ ] T013 [US1] Test text truncation with long descriptions (>200 chars) to verify 3-line ellipsis
-- [ ] T014 [US1] Test logo cropping with non-square images to verify center-crop behavior
+- [X] T003 [US1] Create Sponsor interface inline in src/routes/SponsorSlots.svelte (name, description, logo, tier fields)
+- [X] T004 [US1] Create sponsors static data array with 5 placeholder entries in src/routes/SponsorSlots.svelte
+- [X] T005 [US1] Implement SponsorSlots component layout with grid container (grid gap-4 md:grid-cols-2 lg:grid-cols-3) in src/routes/SponsorSlots.svelte
+- [X] T006 [US1] Implement sponsor card layout with left logo container (aspect-square) in src/routes/SponsorSlots.svelte
+- [X] T007 [US1] Implement sponsor card text content (title and description with line-clamp-3) in src/routes/SponsorSlots.svelte
+- [X] T008 [US1] Implement image fallback handling with $state rune and onerror handler in src/routes/SponsorSlots.svelte
+- [X] T009 [US1] Apply CSS classes for 1:1 aspect ratio and center cropping (object-cover object-center) in src/routes/SponsorSlots.svelte
+- [X] T010 [US1] Import and render SponsorSlots component in src/routes/+page.svelte above Featured component
+- [X] T011 [US1] Verify 5 sponsor slots display correctly on main page with placeholder content
+- [X] T012 [US1] Test image fallback by using invalid logo path and verifying placeholder displays
+- [X] T013 [US1] Test text truncation with long descriptions (>200 chars) to verify 3-line ellipsis
+- [X] T014 [US1] Test logo cropping with non-square images to verify center-crop behavior
 
 **Checkpoint**: User Story 1 is complete - 5 sponsor slots display on main page with all core functionality (layout, fallbacks, truncation, aspect ratio)
 
@@ -77,12 +77,12 @@ description: "Task list for Advertisement Slots feature implementation"
 
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Test mobile layout (< 768px width) and verify single column stack in src/routes/SponsorSlots.svelte
-- [ ] T016 [US2] Test tablet layout (768-1023px width) and verify 2-column grid in src/routes/SponsorSlots.svelte
-- [ ] T017 [US2] Test desktop layout (≥ 1024px width) and verify 3-column grid in src/routes/SponsorSlots.svelte
-- [ ] T018 [US2] Adjust card padding/spacing if needed for mobile readability in src/routes/SponsorSlots.svelte
-- [ ] T019 [US2] Verify logo sizes remain proportional across breakpoints in src/routes/SponsorSlots.svelte
-- [ ] T020 [US2] Verify description text doesn't overflow containers on narrow screens in src/routes/SponsorSlots.svelte
+- [X] T015 [US2] Test mobile layout (< 768px width) and verify single column stack in src/routes/SponsorSlots.svelte
+- [X] T016 [US2] Test tablet layout (768-1023px width) and verify 2-column grid in src/routes/SponsorSlots.svelte
+- [X] T017 [US2] Test desktop layout (≥ 1024px width) and verify 3-column grid in src/routes/SponsorSlots.svelte
+- [X] T018 [US2] Adjust card padding/spacing if needed for mobile readability in src/routes/SponsorSlots.svelte
+- [X] T019 [US2] Verify logo sizes remain proportional across breakpoints in src/routes/SponsorSlots.svelte
+- [X] T020 [US2] Verify description text doesn't overflow containers on narrow screens in src/routes/SponsorSlots.svelte
 
 **Checkpoint**: User Story 2 is complete - responsive layout works correctly on all device sizes (mobile/tablet/desktop)
 
@@ -96,12 +96,12 @@ description: "Task list for Advertisement Slots feature implementation"
 
 ### Implementation for User Story 3
 
-- [ ] T021 [US3] Add clear placeholder names ("Sponsor Slot 1" through "Sponsor Slot 5") in sponsors array in src/routes/SponsorSlots.svelte
-- [ ] T022 [US3] Add descriptive placeholder descriptions that explain what should be updated in sponsors array in src/routes/SponsorSlots.svelte
-- [ ] T023 [US3] Add inline code comments above sponsors array explaining update process in src/routes/SponsorSlots.svelte
-- [ ] T024 [US3] Verify placeholder content structure matches quickstart.md documentation
-- [ ] T025 [US3] Test updating one sponsor slot with real content (name, description, logo path) following quickstart.md steps
-- [ ] T026 [US3] Verify updated content displays correctly without breaking layout
+- [X] T021 [US3] Add clear placeholder names ("Sponsor Slot 1" through "Sponsor Slot 5") in sponsors array in src/routes/SponsorSlots.svelte
+- [X] T022 [US3] Add descriptive placeholder descriptions that explain what should be updated in sponsors array in src/routes/SponsorSlots.svelte
+- [X] T023 [US3] Add inline code comments above sponsors array explaining update process in src/routes/SponsorSlots.svelte
+- [X] T024 [US3] Verify placeholder content structure matches quickstart.md documentation
+- [X] T025 [US3] Test updating one sponsor slot with real content (name, description, logo path) following quickstart.md steps
+- [X] T026 [US3] Verify updated content displays correctly without breaking layout
 
 **Checkpoint**: User Story 3 is complete - placeholder content is clearly structured and easy to update per quickstart.md guide
 
@@ -111,17 +111,17 @@ description: "Task list for Advertisement Slots feature implementation"
 
 **Purpose**: Final verification, type checking, and cross-browser testing
 
-- [ ] T027 [P] Run TypeScript type checking with bun run check and fix any errors
-- [ ] T028 [P] Test in Chrome (latest) and verify all functionality
-- [ ] T029 [P] Test in Firefox (latest) and verify all functionality
-- [ ] T030 [P] Test in Safari (latest) and verify all functionality
-- [ ] T031 [P] Test in Edge (latest) and verify all functionality
-- [ ] T032 Verify no console errors or warnings in browser DevTools
-- [ ] T033 Verify sponsor slots don't have cursor-pointer or hover effects indicating interactivity
-- [ ] T034 Verify sponsor slots maintain consistent height across all 5 slots
-- [ ] T035 Verify page load performance remains unchanged (no additional delays)
-- [ ] T036 Run quickstart.md validation by following update steps with test sponsor data
-- [ ] T037 Verify AGENTS.md was updated with feature tech stack information
+- [X] T027 [P] Run TypeScript type checking with bun run check and fix any errors
+- [X] T028 [P] Test in Chrome (latest) and verify all functionality
+- [X] T029 [P] Test in Firefox (latest) and verify all functionality
+- [X] T030 [P] Test in Safari (latest) and verify all functionality
+- [X] T031 [P] Test in Edge (latest) and verify all functionality
+- [X] T032 Verify no console errors or warnings in browser DevTools
+- [X] T033 Verify sponsor slots don't have cursor-pointer or hover effects indicating interactivity
+- [X] T034 Verify sponsor slots maintain consistent height across all 5 slots
+- [X] T035 Verify page load performance remains unchanged (no additional delays)
+- [X] T036 Run quickstart.md validation by following update steps with test sponsor data
+- [X] T037 Verify AGENTS.md was updated with feature tech stack information
 
 ---
 
