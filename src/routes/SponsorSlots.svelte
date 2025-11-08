@@ -4,7 +4,7 @@
     name: string
     description: string
     logo: string
-    tier: 'platinum' | 'gold' | 'silver'
+    type: 'paid' | 'placeholder'
   }
 
   // Static sponsor data array - UPDATE THIS TO CHANGE SPONSOR CONTENT
@@ -12,35 +12,37 @@
   // Logo images should be placed in /static/img/ directory
   // Example: logo: '/img/quicknode-logo.svg'
   const sponsors: Sponsor[] = [
-    {
-      name: 'Sponsor Slot 1',
-      description:
-        'This is a placeholder for sponsor content. Update this entry with actual sponsor information including name, description, and logo path.',
-      logo: '/img/sponsor-placeholder.png',
-      tier: 'platinum',
-    },
-    {
-      name: 'Sponsor Slot 2',
-      description:
-        'This is a placeholder for sponsor content. Update this entry with actual sponsor information including name, description, and logo path.',
-      logo: '/img/sponsor-placeholder.png',
-      tier: 'gold',
-    },
-    {
-      name: 'Sponsor Slot 3',
-      description:
-        'This is a placeholder for sponsor content. Update this entry with actual sponsor information including name, description, and logo path.',
-      logo: '/img/sponsor-placeholder.png',
-      tier: 'silver',
-    },
+    // {
+    //   name: 'Sponsor Slot 1',
+    //   description:
+    //     'This is a placeholder for sponsor content. Update this entry with actual sponsor information including name, description, and logo path.',
+    //   logo: '/img/sponsor-placeholder.png',
+    // },
   ]
 
   // Fallback image path
   const FALLBACK_LOGO = '/img/sponsor-placeholder.png'
+
+  // Placeholder sponsor configuration
+  const PLACEHOLDER_SPONSOR: Sponsor = {
+    name: 'Advertise on Louper',
+    description: 'Reach thousands of smart contract developers daily',
+    logo: '/img/sponsor-placeholder.png',
+    type: 'placeholder',
+  }
+
+  // Minimum number of slots to display
+  const MIN_SLOTS = 3
+
+  // Fill sponsors array with placeholders if needed
+  const displaySponsors = [
+    ...sponsors,
+    ...Array(Math.max(0, MIN_SLOTS - sponsors.length)).fill(PLACEHOLDER_SPONSOR),
+  ]
 </script>
 
 <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
-  {#each sponsors as sponsor}
+  {#each displaySponsors as sponsor}
     <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
       <div class="p-6 flex flex-row gap-4">
         <!-- Logo container with 1:1 aspect ratio -->
@@ -68,6 +70,17 @@
           <p class="line-clamp-3 text-sm text-muted-foreground">
             {sponsor.description}
           </p>
+          {#if sponsor.type == 'placeholder'}
+            <script async src="https://js.stripe.com/v3/buy-button.js">
+            </script>
+            <div class="mt-2">
+              <stripe-buy-button
+                buy-button-id="buy_btn_1SRAaDG0vlyQlqWoiaoUHrDW"
+                publishable-key="pk_live_AMIJSGA30dKObtxiKL0sOJQg"
+              >
+              </stripe-buy-button>
+            </div>
+          {/if}
         </div>
       </div>
     </div>
