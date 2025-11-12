@@ -71,14 +71,14 @@
             {sponsor.description}
           </p>
           {#if sponsor.type == 'placeholder'}
-            <script async src="https://js.stripe.com/v3/buy-button.js">
-            </script>
             <div class="mt-2">
-              <stripe-buy-button
-                buy-button-id="buy_btn_1SRAaDG0vlyQlqWoiaoUHrDW"
-                publishable-key="pk_live_AMIJSGA30dKObtxiKL0sOJQg"
+              <a
+                href="https://buy.stripe.com/9B614naaddvIdO862HaVa04"
+                target="_blank"
+                class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
               >
-              </stripe-buy-button>
+                Purchase Now
+              </a>
             </div>
           {/if}
         </div>
