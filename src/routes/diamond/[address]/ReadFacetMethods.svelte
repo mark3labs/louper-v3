@@ -12,7 +12,7 @@
   import type { AbiFunction } from 'abitype'
   import { Check, ChevronsUpDown, Copy, CornerDownRight, Loader2 } from '@lucide/svelte'
   import { getContext } from 'svelte'
-  import Tags from 'svelte-tags-input'
+  import TagsInput from '$lib/components/TagsInput.svelte'
   import { type PublicClient, toFunctionSelector } from 'viem'
 
   const diamond = getContext<Diamond>('diamond')
@@ -24,13 +24,22 @@
 
   const onFacetChange = (name: string | undefined) => {
     if (!name) return
-    const facet = facetsList.find(f => f.name === name)
+    const facet = facetsList.find((f) => f.name === name)
     if (!facet) return
     activeAbi = facet.abi
     selectedFacet = facet.name
     comboboxOpen = false
-    for (const [idx] of Object(activeAbi).entries()) {
-      argsResults[idx] = { args: [], result: null }
+    for (const [idx, method] of Object(activeAbi).entries()) {
+      argsResults[idx] = {
+        args: method.inputs.map((input) => {
+          // Initialize array types with empty array
+          if (input.type.indexOf('[') > -1 && input.type.indexOf(']') > -1) {
+            return []
+          }
+          return undefined
+        }),
+        result: null,
+      }
     }
   }
 
@@ -104,10 +113,7 @@
                 <Command.Empty>No facet found.</Command.Empty>
                 <Command.Group>
                   {#each facetsList as f}
-                    <Command.Item
-                      value={f.name}
-                      onSelect={() => onFacetChange(f.name)}
-                    >
+                    <Command.Item value={f.name} onSelect={() => onFacetChange(f.name)}>
                       <Check
                         class={cn('mr-2 h-4 w-4', selectedFacet !== f.name && 'text-transparent')}
                       />
@@ -135,12 +141,7 @@
                   </span>
                   <Collapsible.Trigger>
                     {#snippet child({ props }: { props: any })}
-                      <Button
-                        {...props}
-                        variant="ghost"
-                        size="sm"
-                        class="p-0 uppercase mx-2"
-                      >
+                      <Button {...props} variant="ghost" size="sm" class="p-0 uppercase mx-2">
                         <ChevronsUpDown class="h-4 w-4 mr-2" />
                         <span class="text-muted-foreground">Expand</span>
                       </Button>
@@ -157,17 +158,23 @@
             </div>
             <Collapsible.Content class="p-5 flex flex-col space-y-3">
               <form
-                onsubmit={(e) => { e.preventDefault(); queryContract(idx); }}
+                onsubmit={(e) => {
+                  e.preventDefault()
+                  queryContract(idx)
+                }}
                 class="flex flex-col space-y-3"
               >
                 {#each m.inputs as input, i}
                   <div class="grid w-full max-w-xl items-center gap-1.5">
                     <Label for="email">{input.name ?? 'var'} ({input.type})</Label>
                     {#if input.type === 'bool'}
-                      <Checkbox checked={!!argsResults[idx].args[i]} onCheckedChange={(v) => argsResults[idx].args[i] = (v === true) as any} />
+                      <Checkbox
+                        checked={!!argsResults[idx].args[i]}
+                        onCheckedChange={(v) => (argsResults[idx].args[i] = (v === true) as any)}
+                      />
                     {:else if input.type.indexOf('[') > -1 && input.type.indexOf(']') > -1}
                       <div class="tags-input">
-                        <Tags bind:tags={argsResults[idx].args[i]} allowPaste />
+                        <TagsInput bind:tags={argsResults[idx].args[i]} allowPaste />
                       </div>
                     {:else}
                       <Input

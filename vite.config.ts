@@ -25,7 +25,4 @@ export default defineConfig({
       strict: false,
     },
   },
-  optimizeDeps: {
-    exclude: ['svelte-tags-input'],
-  },
 })
