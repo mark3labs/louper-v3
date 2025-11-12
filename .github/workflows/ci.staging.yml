@@ -29,3 +29,7 @@ jobs:
           tags: |
             mark3labs/louper-web:staging-${{ steps.vars.outputs.version }}
             mark3labs/louper-web:staging-latest
+
+      - name: Trigger deployment webhook
+        run: |
+          curl -X GET "${{ secrets.DEPLOY_WEBHOOK_STAGING }}"
