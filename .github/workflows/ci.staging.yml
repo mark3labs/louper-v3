@@ -32,4 +32,13 @@ jobs:
 
       - name: Trigger deployment webhook
         run: |
-          curl -X GET "${{ secrets.DEPLOY_WEBHOOK_STAGING }}"
+          curl -X POST "${{ secrets.DEPLOY_WEBHOOK_STAGING }}" \
+            -H "Content-Type: application/json" \
+            -H "x-github-event: push" \
+            -d '{
+              "ref": "refs/heads/${{ github.ref_name }}",
+              "head_commit": {
+                "id": "${{ github.sha }}",
+                "message": "${{ github.event.head_commit.message }}"
+              }
+            }'
