@@ -38,7 +38,7 @@ jobs:
           JSON_PAYLOAD=$(jq -n \
             --arg ref "refs/heads/${{ github.ref_name }}" \
             --arg id "${{ github.sha }}" \
-            --arg message "${{ github.event.head_commit.message }}" \
+            --arg message "$(echo "${{ github.event.head_commit.message }}" | head -n1)" \
             '{
               ref: $ref,
               head_commit: {
