@@ -34,13 +34,20 @@ jobs:
 
       - name: Trigger deployment webhook
         run: |
+          # Create JSON payload with proper escaping
+          JSON_PAYLOAD=$(jq -n \
+            --arg ref "refs/heads/${{ github.ref_name }}" \
+            --arg id "${{ github.sha }}" \
+            --arg message "${{ github.event.head_commit.message }}" \
+            '{
+              ref: $ref,
+              head_commit: {
+                id: $id,
+                message: $message
+              }
+            }')
+
           curl -X POST "${{ secrets.DEPLOY_WEBHOOK_PROD }}" \
             -H "Content-Type: application/json" \
             -H "x-github-event: push" \
-            -d '{
-              "ref": "refs/heads/${{ github.ref_name }}",
-              "head_commit": {
-                "id": "${{ github.sha }}",
-                "message": "${{ github.event.head_commit.message }}"
-              }
-            }'
+            -d "$JSON_PAYLOAD"
