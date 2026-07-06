@@ -21,13 +21,16 @@ import consola from 'consola'
 
 export const load: PageServerLoad = async ({ params, url, locals }) => {
   const { address } = params
-  const network = <string>url.searchParams.get('network') ?? 'mainnet'
+  const network = url.searchParams.get('network') || 'mainnet'
 
-  const chain: Chain = chainMap[network]
+  const chain: Chain | undefined = chainMap[network]
+  if (!chain) {
+    throw error(404, { message: `Unknown network: ${network}` })
+  }
 
   const transports = [
-    http(`http://erpc:4000/main/evm/${chain.id}`),
-    ...chain.rpcUrls.default.http.map((url) => http(url)),
+    http(`http://erpc:4000/main/evm/${chain.id}`, { timeout: 10_000, retryCount: 1 }),
+    ...chain.rpcUrls.default.http.map((url) => http(url, { timeout: 10_000, retryCount: 1 })),
   ]
 
   const publicClient = createPublicClient({
@@ -52,7 +55,6 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
       facets: [],
     }
 
-    // AI! do this process asyncronously and wait for all promises to resolve
     // Fetch all facet information asynchronously
     const facetPromises = facetData.map(([address, selectors]) =>
       buildFacet(address, selectors, chain.id, locals.db),

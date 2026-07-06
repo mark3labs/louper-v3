@@ -11,3 +11,15 @@ node_modules
 pnpm-lock.yaml
 package-lock.json
 yarn.lock
+bun.lock
+bun.lockb
+
+# Generated spec/agent docs — do not reformat
+.specify/
+specs/
+AGENTS.md
+.kit.yml
+components.json
+
+# shadcn-svelte generated components — keep as generated
+src/lib/components/ui/

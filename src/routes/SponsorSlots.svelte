@@ -42,7 +42,7 @@
 </script>
 
 <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
-  {#each displaySponsors as sponsor}
+  {#each displaySponsors as sponsor, i (i)}
     <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
       <div class="p-6 flex flex-row gap-4">
         <!-- Logo container with 1:1 aspect ratio -->

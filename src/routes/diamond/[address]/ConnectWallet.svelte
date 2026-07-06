@@ -3,7 +3,7 @@
   import * as Popover from '$lib/components/ui/popover'
   import { switchChain } from '@wagmi/core'
   import { Dot } from '@lucide/svelte'
-  import { getContext, onMount, untrack } from 'svelte'
+  import { getContext, onMount } from 'svelte'
   import {
     chainId,
     connected,
@@ -84,7 +84,7 @@
   <Popover.Root>
     <Popover.Trigger>
       {#snippet child({ props }: { props: any })}
-        <Button {...props} variant="secondary" disabled={busy}>
+        <Button {...props} variant="secondary" disabled={busy} aria-label="Connected wallet">
           <span class="text-green-500 font-medium"><Dot class="h-4 w-4 mr-2" /></span>
           {$signerAddress.slice(0, 5)}...{$signerAddress.slice(-4)}
         </Button>

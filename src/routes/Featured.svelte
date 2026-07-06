@@ -68,12 +68,14 @@
 
 <h1 class="text-2xl font-bold m-5">Featured Diamonds</h1>
 <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-  {#each diamonds as d}
+  {#each diamonds as d (d.url)}
     <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
       <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
         <Button
           class="tracking-tight text-sm font-medium"
           variant="ghost"
+          aria-label={`Inspect ${d.name} diamond`}
+          title={`Inspect ${d.name}`}
           onclick={() => goto(d.url, { replaceState: true })}
         >
           <Search />
