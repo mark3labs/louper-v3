@@ -12,6 +12,11 @@ declare global {
     // interface PageData {}
     // interface Platform {}
   }
+
+  // Google AdSense global injected by the adsbygoogle.js loader
+  interface Window {
+    adsbygoogle?: unknown[]
+  }
 }
 
 export {}
