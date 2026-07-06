@@ -71,7 +71,7 @@ export const init = async () => {
       signerAddress.set(account.address)
     }
     loading.set(false)
-  } catch (err) {
+  } catch {
     loading.set(false)
   }
 }
@@ -102,7 +102,7 @@ export const connection = async () => {
       })
     }
     return { success: true }
-  } catch (err) {
+  } catch {
     return { success: false }
   }
 }

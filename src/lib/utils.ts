@@ -3,7 +3,7 @@ import { twMerge } from 'tailwind-merge'
 import { cubicOut } from 'svelte/easing'
 import type { TransitionConfig } from 'svelte/transition'
 import { type Abi, type AbiFunction, type Address } from 'viem'
-import toast from 'svelte-french-toast'
+import { toast } from 'svelte-sonner'
 import type { Contract } from './types'
 import consola from 'consola'
 

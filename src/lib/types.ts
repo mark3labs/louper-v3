@@ -11,7 +11,8 @@ export interface Diamond extends Contract {
 }
 
 export interface ArgsResult {
-  args: Array<'indeterminate'> | never[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  args: any[]
   result: object | string | number | boolean | null
   error?: string | undefined
   value?: bigint | undefined

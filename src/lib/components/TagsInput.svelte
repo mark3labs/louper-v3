@@ -71,7 +71,7 @@
     className,
   )}
 >
-  {#each tags || [] as tag, i}
+  {#each tags || [] as tag, i (i)}
     <span
       class="svelte-tags-input-tag inline-flex items-center gap-1 rounded-md bg-primary px-2 py-1 text-xs font-medium text-primary-foreground"
     >

@@ -26,13 +26,18 @@
     </Table.Row>
   </Table.Header>
   <Table.Body>
-    {#each diamond.facets as f}
+    {#each diamond.facets as f (f.address)}
       <Table.Row class="border-b-0">
         <Table.Cell>
           <p class="font-medium leading-none text-2xl text-primary">{f.name}</p>
           <p class="text-lg text-muted-foreground">
             {f.address}
-            <Button variant="ghost" onclick={() => copyToClipboard(f.address)} class="p-1">
+            <Button
+              variant="ghost"
+              onclick={() => copyToClipboard(f.address)}
+              class="p-1"
+              aria-label="Copy address"
+            >
               <Copy />
             </Button>
             <Button
@@ -40,6 +45,7 @@
               class="p-1"
               href={`${explorerUrl}/address/${f.address}`}
               target="_blank"
+              aria-label="View on block explorer"
             >
               <ExternalLink />
             </Button>
@@ -48,7 +54,9 @@
         <Table.Cell class="w-1/2">
           <Collapsible.Root>
             <div class="flex items-center justify-start space-x-4">
-              <Badge variant="secondary">{f.abi.filter((m) => m.type === 'function').length} Methods</Badge>
+              <Badge variant="secondary"
+                >{f.abi.filter((m) => m.type === 'function').length} Methods</Badge
+              >
               <Collapsible.Trigger>
                 {#snippet child({ props }: { props: any })}
                   <Button {...props} variant="ghost" size="sm" class="w-9 p-0">
@@ -60,7 +68,7 @@
             </div>
             <Collapsible.Content>
               <ul class="my-6 ml-6 [&>li]:mt-5">
-                {#each abiMethods(f.abi) as m}
+                {#each abiMethods(f.abi) as m, mi (mi)}
                   <li>
                     <div class="flex h-5 items-center space-x-4 text-sm">
                       <code
@@ -79,6 +87,7 @@
                         <Button
                           variant="ghost"
                           onclick={() => copyToClipboard(m.name.split('_')[1])}
+                          aria-label="Copy selector"
                         >
                           <Copy />
                         </Button>
@@ -91,6 +100,7 @@
                         <Button
                           variant="ghost"
                           onclick={() => copyToClipboard(toFunctionSelector(m))}
+                          aria-label="Copy selector"
                         >
                           <Copy />
                         </Button>
@@ -106,7 +116,12 @@
           <Dialog.Root>
             <Dialog.Trigger>
               {#snippet child({ props }: { props: any })}
-                <button {...props} type="button" class="inline-flex items-center justify-center">
+                <button
+                  {...props}
+                  type="button"
+                  class="inline-flex items-center justify-center"
+                  aria-label="View facet ABI"
+                >
                   <Search />
                 </button>
               {/snippet}
@@ -126,6 +141,7 @@
                       variant="ghost"
                       class="absolute top-3 right-3"
                       onclick={() => copyToClipboard(JSON.stringify(f.abi))}
+                      aria-label="Copy ABI"
                     >
                       <Copy />
                     </Button>

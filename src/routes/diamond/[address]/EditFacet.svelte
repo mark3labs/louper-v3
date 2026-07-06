@@ -22,7 +22,6 @@
     parseAbi,
     zeroAddress,
     type WriteContractReturnType,
-    type AbiItem,
     type AbiFunction,
   } from 'viem'
   import type { Chain } from 'viem/chains'
@@ -30,7 +29,7 @@
   import { connected, wagmiConfig } from '$lib/stores/wagmi'
   import * as AlertDialog from '$lib/components/ui/alert-dialog'
   import { getWalletClient, waitForTransactionReceipt } from '@wagmi/core'
-  import toast from 'svelte-french-toast'
+  import { toast } from 'svelte-sonner'
   import * as Card from '$lib/components/ui/card'
   import { Label } from '$lib/components/ui/label'
   import { page } from '$app/stores'
@@ -182,9 +181,8 @@
         }
         strategy.removals[address] = [...strategy.removals[address], selector]
       } else {
-        strategy.removals[address] = strategy.removals[address]?.filter(
-          (r: string) => r !== selector,
-        ) ?? []
+        strategy.removals[address] =
+          strategy.removals[address]?.filter((r: string) => r !== selector) ?? []
       }
     }
   }
@@ -229,9 +227,8 @@
         strategy.additions[address] = strategy.additions[address].filter(
           (r: string) => r !== selector,
         )
-        strategy.replacements[address] = strategy.replacements[address]?.filter(
-          (r: string) => r !== selector,
-        ) ?? []
+        strategy.replacements[address] =
+          strategy.replacements[address]?.filter((r: string) => r !== selector) ?? []
       }
     }
   }
@@ -322,7 +319,13 @@
             {#if addFacetError}
               <p class="text-red-500">{addFacetError}</p>
             {/if}
-            <form class="space-y-2 text-right my-5" onsubmit={(e) => { e.preventDefault(); addFacet(); }}>
+            <form
+              class="space-y-2 text-right my-5"
+              onsubmit={(e) => {
+                e.preventDefault()
+                addFacet()
+              }}
+            >
               <Input placeholder="Facet Address" bind:value={newFacetAddress} required />
               <Button disabled={busy} type="submit">Fetch Facet ABI</Button>
             </form>
@@ -378,13 +381,17 @@
   </Table.Header>
   <Table.Body>
     <!-- New facets -->
-    {#each newFacets as f}
+    {#each newFacets as f (f.address)}
       <Table.Row class="border border-dashed border-green-400">
         <Table.Cell>
           <p class="font-medium leading-none text-2xl text-primary">{f.name}</p>
           <p class="text-lg text-muted-foreground">
             {f.address}
-            <Button variant="ghost" onclick={() => copyToClipboard(f.address)}>
+            <Button
+              variant="ghost"
+              onclick={() => copyToClipboard(f.address)}
+              aria-label="Copy address"
+            >
               <Copy />
             </Button>
           </p>
@@ -404,7 +411,7 @@
                 </Table.Cell>
                 <Table.Cell><Badge variant="secondary">Toggle All</Badge></Table.Cell>
               </Table.Row>
-              {#each abiMethods(f.abi) as m}
+              {#each abiMethods(f.abi) as m, mi (mi)}
                 {@const checkboxKey = f.address.slice(0, 5) + getFunctionSelector(m)}
                 {#if checkboxStates[checkboxKey]}
                   <Table.Row class="border-none">
@@ -441,13 +448,17 @@
     {/each}
 
     <!-- Existing facets -->
-    {#each diamond.facets as f}
+    {#each diamond.facets as f (f.address)}
       <Table.Row>
         <Table.Cell>
           <p class="font-medium leading-none text-2xl text-primary">{f.name}</p>
           <p class="text-lg text-muted-foreground">
             {f.address}
-            <Button variant="ghost" onclick={() => copyToClipboard(f.address)}>
+            <Button
+              variant="ghost"
+              onclick={() => copyToClipboard(f.address)}
+              aria-label="Copy address"
+            >
               <Copy />
             </Button>
           </p>
@@ -467,7 +478,7 @@
                 </Table.Cell>
                 <Table.Cell><Badge variant="secondary">Toggle All</Badge></Table.Cell>
               </Table.Row>
-              {#each abiMethods(f.abi) as m}
+              {#each abiMethods(f.abi) as m, mi (mi)}
                 {@const checkboxKey = f.address.slice(0, 5) + getFunctionSelector(m)}
                 {@const isDisabled = Object.values(strategy.replacements).some((r) =>
                   r.includes(getFunctionSelector(m)),

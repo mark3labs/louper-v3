@@ -63,7 +63,7 @@
     const currentConnected = $connected
     const currentChainId = $chainId
     const currentConfig = $wagmiConfig
-    
+
     if (currentConnected && currentChainId && currentChainId !== chain.id && currentConfig) {
       switchChain(currentConfig, { chainId: chain.id }).catch((error) => {
         console.warn('Failed to switch chain:', error)
@@ -78,7 +78,12 @@
     <p class="text-4xl text-primary font-bold">{data.diamond.name}</p>
     <p class="text-xl text-muted-foreground font-bold">
       {data.diamond.address}
-      <Button variant="ghost" onclick={() => copyToClipboard(data.diamond.address)} class="p-1">
+      <Button
+        variant="ghost"
+        onclick={() => copyToClipboard(data.diamond.address)}
+        class="p-1"
+        aria-label="Copy diamond address"
+      >
         <Copy />
       </Button>
       <Button
@@ -86,6 +91,7 @@
         class="p-1"
         href={`${explorerUrl}/address/${data.diamond.address}`}
         target="_blank"
+        aria-label="View on block explorer"
       >
         <ExternalLink />
       </Button>
@@ -116,6 +122,7 @@
                   variant="ghost"
                   class="absolute top-3 right-3"
                   onclick={() => copyToClipboard(JSON.stringify(data.diamondAbi))}
+                  aria-label="Copy ABI"
                 >
                   <Copy />
                 </Button>

@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { Toaster } from 'svelte-french-toast'
+  import { Toaster } from '$lib/components/ui/sonner'
+  import { toast } from 'svelte-sonner'
   import '../app.postcss'
-  import { Check, ChevronUp, Search, Terminal } from '@lucide/svelte'
-  import type { Address } from 'viem'
+  import { Check, ChevronsUpDown, Search, Terminal } from '@lucide/svelte'
+  import { isAddress, type Address } from 'viem'
   import { chainMap } from '$lib/chains'
   import * as Popover from '$lib/components/ui/popover'
   import { afterNavigate, goto } from '$app/navigation'
   import { navigating } from '$app/stores'
   import { page } from '$app/stores'
   import * as Command from '$lib/components/ui/command'
-  import { tick } from 'svelte'
   import { cn } from '$lib/utils'
   import { Button } from '$lib/components/ui/button'
   import * as Alert from '$lib/components/ui/alert'
@@ -30,13 +30,19 @@
     value: key,
     label: chain.name,
   }))
-  chainOptions.push({ value: 'ethereum', label: 'Ethereum' })
 
   let selectedValue = $derived(
     chainOptions.find((f) => f.value === network)?.label ?? 'Select a chain...',
   )
 
-  const gotoDiamond = () => {
+  let canSearch = $derived(!!network && !!address && isAddress(address))
+
+  const gotoDiamond = (e?: Event) => {
+    e?.preventDefault()
+    if (!canSearch) {
+      toast.error('Enter a valid diamond address and select a chain')
+      return
+    }
     const networkParam = network === 'ethereum' ? 'mainnet' : network
     goto(`/diamond/${address}?network=${networkParam}`, { replaceState: true })
   }
@@ -48,25 +54,20 @@
       address = $page.params.address as Address
     }
     if ($page.url.searchParams.has('network')) {
-      network = $page.url.searchParams.get('network') as string
+      const n = $page.url.searchParams.get('network') as string
+      // Legacy URLs used `ethereum` instead of `mainnet`
+      network = n === 'ethereum' ? 'mainnet' : n
     }
   })
-
-  // We want to refocus the trigger button when the user selects
-  // an item from the list so users can continue navigating the
-  // rest of the form with the keyboard.
-  function closeAndFocusTrigger(triggerId: string) {
-    searchOpen = false
-    tick().then(() => {
-      document.getElementById(triggerId)?.focus()
-    })
-  }
 </script>
 
 <div class="border-b fixed top-0 bg-background w-full z-50 flex flex-row justify-between">
-  <nav class="flex flex-row items-center p-2">
+  <nav class="flex flex-row items-center p-2 min-w-0">
     <img src="/img/louper-logo.png" alt="Louper - The Ethereum Diamond Inspector" class="h-12" />
-    <h2 class="ml-2 text-lg font-bold text-primary">Louper - The Ethereum Diamond Inspector</h2>
+    <h2 class="ml-2 text-lg font-bold text-primary truncate">
+      <span class="sm:hidden">Louper</span>
+      <span class="hidden sm:inline">Louper - The Ethereum Diamond Inspector</span>
+    </h2>
   </nav>
   <nav class="flex flex-row items-center p-2"></nav>
 </div>
@@ -87,8 +88,8 @@
 <div class="container">
   <div class="my-24 rounded-[0.5rem] border shadow-sm shadow-primary">
     <div class="border-b">
-      <div class="flex h-16 items-center p-5">
-        <nav class="flex items-center space-x-4 lg:space-x-6 mx-6">
+      <div class="flex flex-wrap items-center gap-y-3 p-5">
+        <nav class="flex flex-wrap items-center gap-x-4 gap-y-2 lg:gap-x-6 mx-2 md:mx-6">
           <a
             href="/"
             class="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
@@ -116,12 +117,16 @@
             Discord
           </a>
         </nav>
-        <div class="ml-auto flex items-center space-x-4">
+        <form class="ml-auto flex flex-wrap items-center gap-2 md:gap-4" onsubmit={gotoDiamond}>
           <div>
+            <label for="diamond-address-input" class="sr-only">Diamond address</label>
             <input
+              id="diamond-address-input"
               class="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 h-9 md:w-[100px] lg:w-[300px]"
               type="search"
               placeholder="Diamond address..."
+              autocomplete="off"
+              spellcheck="false"
               bind:value={address}
             />
           </div>
@@ -137,7 +142,7 @@
                     class="w-[200px] justify-between"
                   >
                     {selectedValue}
-                    <ChevronUp class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 {/snippet}
               </Popover.Trigger>
@@ -147,9 +152,9 @@
                   <Command.List>
                     <Command.Empty>No chain found.</Command.Empty>
                     <Command.Group>
-                      {#each chainOptions as chain}
+                      {#each chainOptions as chain (chain.value)}
                         <Command.Item
-                          value={chain.value}
+                          value={`${chain.label} ${chain.value}`}
                           onSelect={() => {
                             network = chain.value
                             searchOpen = false
@@ -170,15 +175,22 @@
               </Popover.Content>
             </Popover.Root>
           </div>
-          <button onclick={gotoDiamond}>
+          <Button
+            type="submit"
+            variant="ghost"
+            size="icon"
+            aria-label="Inspect diamond"
+            title="Inspect diamond"
+            disabled={!canSearch}
+          >
             <Search class="h-6 w-8" />
-          </button>
-        </div>
+          </Button>
+        </form>
       </div>
     </div>
     <div class="p-5">
       {#if $navigating}
-        <div class="flex items-centerm justify-center space-x-2">
+        <div class="flex items-center justify-center space-x-2">
           <img
             src="/img/louper-logo.png"
             alt="Louper - The Ethereum Diamond Inspector"
@@ -192,7 +204,7 @@
     </div>
   </div>
 </div>
-<Toaster />
+<Toaster richColors theme="dark" position="bottom-right" />
 
 <style lang="postcss">
 </style>

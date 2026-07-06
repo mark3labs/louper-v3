@@ -8,7 +8,7 @@
   import * as Command from '$lib/components/ui/command'
   import * as Table from '$lib/components/ui/table'
   import { connected, wagmiConfig, isUsingSafe } from '$lib/stores/wagmi'
-  import type { ArgsResult, Diamond, FacetSelection } from '$lib/types'
+  import type { ArgsResult, Diamond } from '$lib/types'
   import { abiMethods, copyToClipboard, sleep, cn } from '$lib/utils'
   import { getWalletClient, waitForTransactionReceipt } from '@wagmi/core'
   import type { AbiFunction } from 'abitype'
@@ -35,7 +35,7 @@
     activeAbi = facet.abi
     selectedFacet = facet.name
     comboboxOpen = false
-    for (const [idx, method] of Object(activeAbi).entries()) {
+    for (const [idx, method] of activeAbi.entries()) {
       argsResults[idx] = {
         args: method.inputs.map((input) => {
           // Initialize array types with empty array
@@ -152,7 +152,7 @@
               <Command.List>
                 <Command.Empty>No facet found.</Command.Empty>
                 <Command.Group>
-                  {#each facetsList as f}
+                  {#each facetsList as f (f.name)}
                     <Command.Item value={f.name} onSelect={() => onFacetChange(f.name)}>
                       <Check
                         class={cn('mr-2 h-4 w-4', selectedFacet !== f.name && 'text-transparent')}
@@ -169,7 +169,7 @@
     </Table.Row>
   </Table.Header>
   <Table.Body>
-    {#each activeAbi as m, idx}
+    {#each activeAbi as m, idx (idx)}
       <Table.Row>
         <Table.Cell colspan={2}>
           <Collapsible.Root>
@@ -190,7 +190,11 @@
                 </p>
                 <p class="text-lg text-muted-foreground">
                   {toFunctionSelector(m)}
-                  <Button variant="ghost" onclick={() => copyToClipboard(toFunctionSelector(m))}>
+                  <Button
+                    variant="ghost"
+                    onclick={() => copyToClipboard(toFunctionSelector(m))}
+                    aria-label="Copy selector"
+                  >
                     <Copy />
                   </Button>
                 </p>
@@ -215,7 +219,7 @@
                     />
                   </div>
                 {/if}
-                {#each m.inputs as input, i}
+                {#each m.inputs as input, i (i)}
                   <div class="grid w-full max-w-xl items-center gap-1.5">
                     <Label>{input.name ?? 'var'} ({input.type})</Label>
                     {#if input.type === 'bool'}
