@@ -135,16 +135,12 @@
     <Tabs.Root bind:value={selectedTab} class="w-full">
       <Tabs.List class="mb-5">
         <Tabs.Trigger value="facets" onclick={disconnect}>Facets</Tabs.Trigger>
-        <Tabs.Trigger value="history" onclick={disconnect}>History</Tabs.Trigger>
         <Tabs.Trigger value="read" onclick={disconnect}>Read</Tabs.Trigger>
         <Tabs.Trigger value="write" onclick={disconnect}>Write</Tabs.Trigger>
         <Tabs.Trigger value="edit" onclick={disconnect}>Edit</Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content value="facets" class="border rounded-[0.5rem] p-5">
         <FacetsTable />
-      </Tabs.Content>
-      <Tabs.Content value="history" class="border rounded-[0.5rem] p-5">
-        🚧 Under Construction... 🏗
       </Tabs.Content>
       <Tabs.Content value="read" class="border rounded-[0.5rem] p-5">
         <ReadFacetMethods />
