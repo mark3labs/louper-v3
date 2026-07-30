@@ -1,0 +1,4 @@
+mcpServers:
+  playwright:
+    type: local
+    command: ["npx", "-y", "playwriter@latest"]
