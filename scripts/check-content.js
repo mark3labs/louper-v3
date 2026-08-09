@@ -93,6 +93,39 @@ for (const file of walk(routes)) {
   }
 }
 
+// --- 6: AdSense publisher ID matches ads.txt --------------------------------
+// A mismatch between data-ad-client and ads.txt makes Google refuse to serve
+// ads, with no error anywhere in the page. Cheap to assert, painful to debug.
+try {
+  const adsSrc = readFileSync(join(root, 'src', 'lib', 'ads.ts'), 'utf-8')
+  const adsTxt = readFileSync(join(root, 'static', 'ads.txt'), 'utf-8')
+
+  const clientMatch = adsSrc.match(/ADSENSE_CLIENT\s*=\s*'(ca-pub-\d+)'/)
+  const txtMatch = adsTxt.match(/pub-(\d+)/)
+
+  if (!clientMatch) {
+    errors.push('ads.ts: could not find ADSENSE_CLIENT constant')
+  } else if (!txtMatch) {
+    errors.push('static/ads.txt: could not find a pub-<digits> entry')
+  } else if (clientMatch[1] !== `ca-pub-${txtMatch[1]}`) {
+    errors.push(
+      `AdSense publisher ID mismatch: ads.ts has ${clientMatch[1]} but ` +
+        `static/ads.txt has pub-${txtMatch[1]}`,
+    )
+  }
+
+  // Warn (not error) while the placeholder slot is still in place, so the
+  // build stays green but nobody forgets ads are switched off.
+  if (/AD_SLOTS[^=]*=\s*\[\s*'0000000000'\s*\]/.test(adsSrc)) {
+    warnings.push(
+      "AD_SLOTS still contains the placeholder '0000000000' — no ads will render " +
+        'until it is replaced with a real AdSense unit ID',
+    )
+  }
+} catch (e) {
+  errors.push(`Could not verify AdSense configuration: ${e.message}`)
+}
+
 // --- report -----------------------------------------------------------------
 for (const w of warnings) console.warn(`warning  ${w}`)
 for (const e of errors) console.error(`error    ${e}`)

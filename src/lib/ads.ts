@@ -9,6 +9,29 @@ import { env } from '$env/dynamic/public'
  * those cases impossible to hit by accident.
  */
 
+/**
+ * AdSense publisher ID.
+ *
+ * This is NOT a secret: it is rendered into every page as `data-ad-client`
+ * and is already committed in `static/ads.txt`. It lives in source so a
+ * deployment works with zero configuration. `scripts/check-content.js`
+ * asserts it stays in sync with ads.txt.
+ */
+export const ADSENSE_CLIENT = 'ca-pub-9877658282151286'
+
+/**
+ * AdSense ad unit IDs (the `data-ad-slot` numbers from the AdSense dashboard).
+ *
+ * Also not secret — these appear in the page HTML. Add real unit IDs here and
+ * commit; there is nothing to configure at deploy time.
+ *
+ * The value below is a placeholder and is deliberately rejected by
+ * `isValidSlot`, so an unconfigured site renders no ad markup at all rather
+ * than an empty box labelled "Advertisement" (which is itself a policy
+ * problem). Replace it with a real unit ID to switch ads on.
+ */
+export const AD_SLOTS: string[] = ['0000000000']
+
 /** Placeholder used before real AdSense unit IDs were configured. */
 const PLACEHOLDER_SLOT = '0000000000'
 
@@ -29,10 +52,16 @@ export const isValidSlot = (slot: string | undefined): boolean => {
   return !!s && s !== PLACEHOLDER_SLOT && /^\d{6,}$/.test(s)
 }
 
-/** The AdSense publisher ID, e.g. `ca-pub-1234567890123456`. */
+/**
+ * The AdSense publisher ID, e.g. `ca-pub-1234567890123456`.
+ *
+ * Defaults to the committed ADSENSE_CLIENT constant. PUBLIC_ADSENSE_CLIENT may
+ * override it (useful for testing against a different account) but is not
+ * required for normal operation.
+ */
 export const adsenseClient = (): string | undefined => {
-  const client = env.PUBLIC_ADSENSE_CLIENT
-  return client && /^ca-pub-\d+$/.test(client) ? client : undefined
+  const client = (env.PUBLIC_ADSENSE_CLIENT || ADSENSE_CLIENT).trim()
+  return /^ca-pub-\d+$/.test(client) ? client : undefined
 }
 
 /**
@@ -103,17 +132,21 @@ export type AdUnit = {
 /**
  * Configured AdSense units.
  *
- * Populate from AdSense-issued unit IDs via PUBLIC_ADSENSE_SLOT_*. Anything
- * that fails `isValidSlot` is dropped, so an unset or placeholder value simply
- * renders nothing rather than an empty labelled ad frame.
+ * Sourced from the committed AD_SLOTS constant, with an optional
+ * PUBLIC_ADSENSE_SLOT_CONTENT override for one-off testing. Anything that
+ * fails `isValidSlot` (unset, placeholder, non-numeric) is dropped, so an
+ * unconfigured deployment renders nothing rather than an empty labelled ad
+ * frame.
  *
  * NOTE: if this array is empty, NO ads appear anywhere on the site and the
  * adsbygoogle loader is never injected. That is the intended behaviour for an
  * unconfigured deployment — see `describeAdConfig()` for a diagnostic.
  */
-export const adUnits: AdUnit[] = [{ slot: normaliseSlot(env.PUBLIC_ADSENSE_SLOT_CONTENT) }].filter(
-  (u) => isValidSlot(u.slot),
+export const adUnits: AdUnit[] = (
+  env.PUBLIC_ADSENSE_SLOT_CONTENT ? [env.PUBLIC_ADSENSE_SLOT_CONTENT] : AD_SLOTS
 )
+  .map((slot) => ({ slot: normaliseSlot(slot) }))
+  .filter((u) => isValidSlot(u.slot))
 
 /**
  * Human-readable explanation of why ads are (or are not) configured.
@@ -122,16 +155,18 @@ export const adUnits: AdUnit[] = [{ slot: normaliseSlot(env.PUBLIC_ADSENSE_SLOT_
  * logs rather than silently rendering no ads.
  */
 export const describeAdConfig = (): string => {
-  const show = (v: string | undefined) => (v === undefined ? '<unset>' : `"${v}"`)
-
   if (!isProduction()) {
-    return `ads disabled: PUBLIC_BUILD_ENV is ${show(env.PUBLIC_BUILD_ENV)}, not "production"`
+    return `ads disabled: PUBLIC_BUILD_ENV is "${env.PUBLIC_BUILD_ENV ?? '<unset>'}", not "production"`
   }
   if (!adsenseClient()) {
-    return `ads disabled: PUBLIC_ADSENSE_CLIENT is ${show(env.PUBLIC_ADSENSE_CLIENT)} (expected ca-pub-<digits>)`
+    return `ads disabled: invalid publisher ID "${env.PUBLIC_ADSENSE_CLIENT || ADSENSE_CLIENT}" (expected ca-pub-<digits>)`
   }
   if (adUnits.length === 0) {
-    return `ads disabled: PUBLIC_ADSENSE_SLOT_CONTENT is ${show(env.PUBLIC_ADSENSE_SLOT_CONTENT)} (expected a numeric AdSense unit ID of 6+ digits)`
+    return (
+      `ads disabled: no valid ad unit. AD_SLOTS in src/lib/ads.ts is ` +
+      `[${AD_SLOTS.map((s) => `"${s}"`).join(', ')}] — replace the placeholder ` +
+      `with a real AdSense unit ID (6+ digits) and redeploy`
+    )
   }
   return `ads enabled: ${adUnits.length} unit(s) for client ${adsenseClient()}`
 }
