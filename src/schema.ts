@@ -7,6 +7,15 @@ export const diamonds = sqliteTable('diamonds', {
   address: text('address').notNull(),
   name: text('name').notNull(),
   visits: integer('visits').notNull().default(0),
+  /**
+   * Number of facets returned by the contract's `facets()` loupe call on the
+   * most recent successful load.
+   *
+   * 0 means "not yet recorded" for rows created before this column existed, as
+   * well as genuinely empty diamonds. Either way such rows are excluded from
+   * the sitemap until a visit records a real count. See scripts/backfill-facet-counts.ts.
+   */
+  facetCount: integer('facetCount').notNull().default(0),
   createdAt: text('createdAt').default(sql`CURRENT_TIMESTAMP`),
 })
 

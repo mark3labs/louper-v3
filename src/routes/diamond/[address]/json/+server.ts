@@ -15,8 +15,7 @@ import {
 import type { Chain } from 'viem/chains'
 import { chainMap } from '$lib/chains'
 import { type BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite'
-import { diamonds } from '../../../../schema'
-import { sql } from 'drizzle-orm'
+import { recordDiamondVisit } from '$lib/diamond.server'
 import consola from 'consola'
 
 export const GET: RequestHandler = async ({ params, url, locals }) => {
@@ -70,21 +69,12 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 
     // Udate the database
     consola.info('Updating stats...')
-    await locals.db
-      .insert(diamonds)
-      .values({
-        id: `${network}:${address}`,
-        network,
-        address,
-        name: diamond.name,
-        visits: 1,
-      })
-      .onConflictDoUpdate({
-        target: [diamonds.id],
-        set: {
-          visits: sql`${diamonds.visits} + 1`,
-        },
-      })
+    await recordDiamondVisit(locals.db, {
+      network,
+      address,
+      name: diamond.name,
+      facetCount: diamond.facets.length,
+    })
     consola.info('Stats updated.')
 
     const response = {

@@ -24,11 +24,48 @@
   import WriteFacetMethods from './WriteFacetMethods.svelte'
   import { page } from '$app/stores'
   import { browser } from '$app/environment'
+  import Seo from '$lib/components/Seo.svelte'
+  import { canonical } from '$lib/seo'
 
   let { data }: { data: PageData } = $props()
   let selectedTab = $state($page.url.hash.replace('#', '') || 'facets')
 
   const chain: Chain = chainMap[data.chain]
+
+  // Unique, descriptive metadata per diamond. Without this every one of the
+  // thousands of /diamond/* URLs would share a single title and description.
+  const shortAddress = $derived(
+    `${data.diamond.address.slice(0, 6)}…${data.diamond.address.slice(-4)}`,
+  )
+  const facetCount = $derived(data.diamond.facets.length)
+  const methodCount = $derived(
+    data.diamond.facets.reduce(
+      (total, f) => total + f.abi.filter((m) => m.type === 'function').length,
+      0,
+    ),
+  )
+  const seoTitle = $derived(
+    `${data.diamond.name} (${shortAddress}) on ${chain?.name ?? data.chain}`,
+  )
+  const seoDescription = $derived(
+    `Inspect ${data.diamond.name} at ${data.diamond.address} on ${chain?.name ?? data.chain}: ` +
+      `${facetCount} facets and ${methodCount} functions. Browse facets, read contract state and export the combined ABI.`,
+  )
+  const seoCanonical = $derived(`/diamond/${data.diamond.address}?network=${data.chain}`)
+
+  const jsonLd = $derived({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: canonical('/') },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: data.diamond.name,
+        item: canonical(seoCanonical),
+      },
+    ],
+  })
 
   const transports = chain.rpcUrls.default.http.map((url) => http(url))
 
@@ -72,6 +109,14 @@
     }
   })
 </script>
+
+<Seo
+  title={seoTitle}
+  description={seoDescription}
+  canonicalPath={seoCanonical}
+  {jsonLd}
+  noindex={facetCount < 1}
+/>
 
 <div class="flex flex-col space-y-6">
   <div class="py-5">

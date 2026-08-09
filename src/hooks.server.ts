@@ -1,6 +1,6 @@
 import type { Handle } from '@sveltejs/kit'
 import { getDb } from '$lib/db.server'
-import { env } from '$env/dynamic/public'
+import { adUnits, adsenseClient, isProduction, pathAllowsAds } from '$lib/ads'
 
 export const handle = (async ({ resolve, event }) => {
   event.locals.db = getDb()
@@ -8,9 +8,7 @@ export const handle = (async ({ resolve, event }) => {
   const response = await resolve(event, {
     transformPageChunk: ({ html }) => {
       // Only include analytics + AdSense scripts in production builds
-      const isProduction = env.PUBLIC_BUILD_ENV === 'production'
-
-      if (!isProduction) {
+      if (!isProduction()) {
         // Remove the analytics script if not in production.
         // The AdSense loader is intentionally NOT injected in non-production to
         // avoid Google flagging dev/staging traffic as invalid activity.
@@ -20,13 +18,26 @@ export const handle = (async ({ resolve, event }) => {
         )
       }
 
-      // Production: inject the Google AdSense loader using the publisher ID
-      // from PUBLIC_ADSENSE_CLIENT (set in your deployment environment / .env).
-      const adsenseClient = env.PUBLIC_ADSENSE_CLIENT
-      if (adsenseClient) {
+      // Production: inject the Google AdSense loader only when
+      //   1. a valid publisher ID is configured,
+      //   2. at least one real ad unit exists,
+      //   3. the current route is allowed to show ads at all, and
+      //   4. the load function did not flag the page as thin.
+      //
+      // Conditions 3 and 4 keep the loader off legal/utility pages and off
+      // pages that resolved to no content. The layout applies the remaining
+      // runtime checks (error boundary, loading state) before any ad unit is
+      // actually rendered.
+      const client = adsenseClient()
+      if (
+        client &&
+        adUnits.length > 0 &&
+        pathAllowsAds(event.url.pathname) &&
+        !event.locals.thinContent
+      ) {
         return html.replace(
           '</head>',
-          `\t<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}" crossorigin="anonymous"></script>\n  </head>`,
+          `\t<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}" crossorigin="anonymous"></script>\n  </head>`,
         )
       }
 

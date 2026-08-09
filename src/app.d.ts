@@ -8,6 +8,12 @@ declare global {
     // interface Error {}
     interface Locals {
       db: BunSQLiteDatabase
+      /**
+       * Set by a load function when the page resolved to little or no content
+       * (e.g. a diamond exposing zero facets). `hooks.server.ts` reads this to
+       * skip injecting the AdSense loader on such screens.
+       */
+      thinContent?: boolean
     }
     // interface PageData {}
     // interface Platform {}

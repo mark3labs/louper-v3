@@ -15,8 +15,7 @@ import {
 import type { Chain } from 'viem/chains'
 import { chainMap } from '$lib/chains'
 import { type BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite'
-import { diamonds } from '../../../schema'
-import { sql } from 'drizzle-orm'
+import { recordDiamondVisit } from '$lib/diamond.server'
 import consola from 'consola'
 
 export const load: PageServerLoad = async ({ params, url, locals }) => {
@@ -66,6 +65,11 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
     // Filter out any undefined facets and add them to the diamond
     diamond.facets = facets.filter((facet) => facet !== undefined)
 
+    // A diamond with no facets has nothing meaningful to show. Flag it so the
+    // AdSense loader is not injected (the layout also suppresses the ad units,
+    // and the page marks itself noindex).
+    locals.thinContent = diamond.facets.length < 1
+
     // Combine all facet ABIs into the diamond ABI
     for (const facet of diamond.facets) {
       diamondAbi = [...diamondAbi, ...facet.abi]
@@ -73,21 +77,12 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
 
     // Udate the database
     consola.info('Updating stats...')
-    await locals.db
-      .insert(diamonds)
-      .values({
-        id: `${network}:${address}`,
-        network,
-        address,
-        name: diamond.name,
-        visits: 1,
-      })
-      .onConflictDoUpdate({
-        target: [diamonds.id],
-        set: {
-          visits: sql`${diamonds.visits} + 1`,
-        },
-      })
+    await recordDiamondVisit(locals.db, {
+      network,
+      address,
+      name: diamond.name,
+      facetCount: diamond.facets.length,
+    })
 
     return {
       chain: network,
