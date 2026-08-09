@@ -31,6 +31,13 @@ const CONCURRENCY = 5
 const loupeAbi = parseAbi(['function facets() view returns ((address,bytes4[])[])'])
 
 const sqlite = new Database('./data/louper.db')
+
+// The database uses a rollback journal (not WAL), so a writer takes an
+// exclusive lock. Without this, running the backfill while the site is live
+// fails instantly with SQLITE_BUSY the moment a visitor loads a diamond.
+// Wait for the server's (very short) write transactions instead of giving up.
+sqlite.exec('PRAGMA busy_timeout = 10000')
+
 const db = drizzle(sqlite)
 
 const rows = db.select().from(diamonds).all()
