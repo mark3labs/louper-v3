@@ -9,6 +9,7 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --check . && eslint .",
+    "check:content": "node scripts/check-content.js",
     "format": "prettier --write .",
     "migrate": "bun run migrate:validate && bun run migrate:backup && bun run migrate:upgrade-core && bun run migrate:svelte && bun run migrate:update-deps && bun run migrate:regenerate-components && bun run migrate:test",
     "migrate:validate": "bun run scripts/validate-migration.js",

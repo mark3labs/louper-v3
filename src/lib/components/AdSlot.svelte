@@ -1,13 +1,16 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { env } from '$env/dynamic/public'
+  import { adsenseClient, isValidSlot } from '$lib/ads'
 
-  // Reusable Google AdSense ad unit.
-  //
-  // The publisher ID (ca-pub-XXXXXXXXXXXXXXXX) comes from the PUBLIC_ADSENSE_CLIENT
-  // env var. The adsbygoogle.js loader is injected in production only (see
-  // src/hooks.server.ts), so in dev/staging this renders an empty reserved box and
-  // the push() call is a harmless no-op (window.adsbygoogle is undefined).
+  /**
+   * A single Google AdSense unit.
+   *
+   * This component assumes the caller has already decided ads are permitted on
+   * the current screen (see `shouldRenderAds` in $lib/ads). It additionally
+   * refuses to render if the publisher ID or slot ID is missing or is still the
+   * placeholder value, so a misconfiguration produces no markup at all rather
+   * than an empty box labelled "Advertisement".
+   */
   let {
     slot,
     format = 'auto',
@@ -20,9 +23,16 @@
     className?: string
   } = $props()
 
+  const client = adsenseClient()
+  const enabled = $derived(!!client && isValidSlot(slot))
+
+  let mounted = $state(false)
+
   onMount(() => {
-    // onMount only runs in the browser, so this never executes during SSR.
+    if (!enabled) return
+    mounted = true
     try {
+      // `Window.adsbygoogle` is declared in src/app.d.ts
       window.adsbygoogle = window.adsbygoogle || []
       window.adsbygoogle.push({})
     } catch (e) {
@@ -31,14 +41,16 @@
   })
 </script>
 
-<div class="flex flex-col {className}">
-  <span class="mb-1 text-xs uppercase tracking-wide text-muted-foreground/60"> Advertisement </span>
-  <ins
-    class="adsbygoogle block min-h-[120px]"
-    style="display:block"
-    data-ad-client={env.PUBLIC_ADSENSE_CLIENT}
-    data-ad-slot={slot}
-    data-ad-format={format}
-    data-full-width-responsive={fullWidthResponsive ? 'true' : 'false'}
-  ></ins>
-</div>
+{#if enabled && mounted}
+  <aside class="flex flex-col {className}" aria-label="Advertisement">
+    <span class="mb-1 text-xs uppercase tracking-wide text-muted-foreground/60">Advertisement</span>
+    <ins
+      class="adsbygoogle block"
+      style="display:block"
+      data-ad-client={client}
+      data-ad-slot={slot}
+      data-ad-format={format}
+      data-full-width-responsive={fullWidthResponsive ? 'true' : 'false'}
+    ></ins>
+  </aside>
+{/if}

@@ -15,6 +15,8 @@
   import * as Alert from '$lib/components/ui/alert'
   import type { Snippet } from 'svelte'
   import SponsorSlots from './SponsorSlots.svelte'
+  import SiteFooter from '$lib/components/SiteFooter.svelte'
+  import { shouldRenderAds } from '$lib/ads'
 
   let {
     children,
@@ -59,6 +61,24 @@
       network = n === 'ethereum' ? 'mainnet' : n
     }
   })
+
+  // Advertising gate. Ads must never render on loading screens, on the error
+  // boundary, or on thin utility pages -- see $lib/ads for the full policy.
+  //
+  // A diamond that resolves with zero facets has nothing meaningful on the
+  // page, so it counts as thin content even though the route itself is allowed.
+  let isThinDiamond = $derived(
+    $page.url.pathname.startsWith('/diamond/') && ($page.data?.diamond?.facets?.length ?? 0) < 1,
+  )
+
+  let adsVisible = $derived(
+    shouldRenderAds({
+      pathname: $page.url.pathname,
+      isNavigating: !!$navigating,
+      hasError: !!$page.error,
+      thinContent: isThinDiamond,
+    }),
+  )
 </script>
 
 <div class="border-b fixed top-0 bg-background w-full z-50 flex flex-row justify-between">
@@ -82,11 +102,8 @@
   </Alert.Root>
 </div>
 
-<div class="container my-5">
-  <SponsorSlots />
-</div>
 <div class="container">
-  <div class="my-24 rounded-[0.5rem] border shadow-sm shadow-primary">
+  <div class="my-12 rounded-[0.5rem] border shadow-sm shadow-primary">
     <div class="border-b">
       <div class="flex flex-wrap items-center gap-y-3 p-5">
         <nav class="flex flex-wrap items-center gap-x-4 gap-y-2 lg:gap-x-6 mx-2 md:mx-6">
@@ -95,6 +112,12 @@
             class="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
           >
             Home
+          </a>
+          <a
+            href="/learn"
+            class="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+          >
+            Learn
           </a>
           <a
             href="https://eips.ethereum.org/EIPS/eip-2535"
@@ -203,7 +226,17 @@
       {/if}
     </div>
   </div>
+
+  <!-- Advertising sits below the page content, never above it, and only on
+       screens that carry substantial publisher content of their own. -->
+  {#if adsVisible}
+    <div class="mb-12">
+      <SponsorSlots />
+    </div>
+  {/if}
 </div>
+
+<SiteFooter />
 <Toaster richColors theme="dark" position="bottom-right" />
 
 <style lang="postcss">
