@@ -12,9 +12,22 @@ import { env } from '$env/dynamic/public'
 /** Placeholder used before real AdSense unit IDs were configured. */
 const PLACEHOLDER_SLOT = '0000000000'
 
-/** A slot ID is only usable if it is a real, non-placeholder numeric unit ID. */
-export const isValidSlot = (slot: string | undefined): boolean =>
-  !!slot && slot !== PLACEHOLDER_SLOT && /^\d{6,}$/.test(slot)
+/** Strips whitespace and stray surrounding quotes from an env-provided slot. */
+export const normaliseSlot = (slot: string | undefined): string =>
+  (slot ?? '').trim().replace(/^['"]|['"]$/g, '')
+
+/**
+ * A slot ID is only usable if it is a real, non-placeholder numeric unit ID.
+ *
+ * Values are normalised first: pasting a unit ID into a .env file or a
+ * docker-compose `environment:` block easily leaves surrounding whitespace or
+ * quotes, and silently showing no ads because of an invisible space is a
+ * miserable thing to debug.
+ */
+export const isValidSlot = (slot: string | undefined): boolean => {
+  const s = normaliseSlot(slot)
+  return !!s && s !== PLACEHOLDER_SLOT && /^\d{6,}$/.test(s)
+}
 
 /** The AdSense publisher ID, e.g. `ca-pub-1234567890123456`. */
 export const adsenseClient = (): string | undefined => {
@@ -93,7 +106,32 @@ export type AdUnit = {
  * Populate from AdSense-issued unit IDs via PUBLIC_ADSENSE_SLOT_*. Anything
  * that fails `isValidSlot` is dropped, so an unset or placeholder value simply
  * renders nothing rather than an empty labelled ad frame.
+ *
+ * NOTE: if this array is empty, NO ads appear anywhere on the site and the
+ * adsbygoogle loader is never injected. That is the intended behaviour for an
+ * unconfigured deployment — see `describeAdConfig()` for a diagnostic.
  */
-export const adUnits: AdUnit[] = [{ slot: env.PUBLIC_ADSENSE_SLOT_CONTENT ?? '' }].filter((u) =>
-  isValidSlot(u.slot),
+export const adUnits: AdUnit[] = [{ slot: normaliseSlot(env.PUBLIC_ADSENSE_SLOT_CONTENT) }].filter(
+  (u) => isValidSlot(u.slot),
 )
+
+/**
+ * Human-readable explanation of why ads are (or are not) configured.
+ *
+ * Logged once at server start so a misconfigured deployment is visible in the
+ * logs rather than silently rendering no ads.
+ */
+export const describeAdConfig = (): string => {
+  const show = (v: string | undefined) => (v === undefined ? '<unset>' : `"${v}"`)
+
+  if (!isProduction()) {
+    return `ads disabled: PUBLIC_BUILD_ENV is ${show(env.PUBLIC_BUILD_ENV)}, not "production"`
+  }
+  if (!adsenseClient()) {
+    return `ads disabled: PUBLIC_ADSENSE_CLIENT is ${show(env.PUBLIC_ADSENSE_CLIENT)} (expected ca-pub-<digits>)`
+  }
+  if (adUnits.length === 0) {
+    return `ads disabled: PUBLIC_ADSENSE_SLOT_CONTENT is ${show(env.PUBLIC_ADSENSE_SLOT_CONTENT)} (expected a numeric AdSense unit ID of 6+ digits)`
+  }
+  return `ads enabled: ${adUnits.length} unit(s) for client ${adsenseClient()}`
+}

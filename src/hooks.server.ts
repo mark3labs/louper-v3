@@ -1,8 +1,24 @@
 import type { Handle } from '@sveltejs/kit'
 import { getDb } from '$lib/db.server'
-import { adUnits, adsenseClient, isProduction, pathAllowsAds } from '$lib/ads'
+import { adUnits, adsenseClient, describeAdConfig, isProduction, pathAllowsAds } from '$lib/ads'
+import consola from 'consola'
+
+// Report the advertising configuration once on the first request, so a
+// deployment that is missing PUBLIC_ADSENSE_SLOT_CONTENT is obvious in the
+// logs instead of just quietly showing no ads.
+let adConfigLogged = false
 
 export const handle = (async ({ resolve, event }) => {
+  if (!adConfigLogged) {
+    adConfigLogged = true
+    const summary = describeAdConfig()
+    if (summary.startsWith('ads disabled') && isProduction()) {
+      consola.warn(`AdSense: ${summary}`)
+    } else {
+      consola.info(`AdSense: ${summary}`)
+    }
+  }
+
   event.locals.db = getDb()
 
   const response = await resolve(event, {
