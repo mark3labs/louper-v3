@@ -2,7 +2,8 @@
   import Seo from '$lib/components/Seo.svelte'
   import Prose from '$lib/components/Prose.svelte'
   import { CONTACT_EMAIL, canonical } from '$lib/seo'
-  import { Mail, Github, MessageCircle } from '@lucide/svelte'
+  import { Mail, MessageCircle } from '@lucide/svelte'
+  import GithubIcon from '$lib/components/icons/GithubIcon.svelte'
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -18,7 +19,7 @@
 
   const channels = [
     {
-      icon: Github,
+      icon: GithubIcon,
       title: 'GitHub Issues',
       body: 'Bug reports, feature requests, missing networks, and corrections to the guides. This is the fastest route for anything technical, and the discussion stays public and searchable.',
       href: 'https://github.com/mark3labs/louper-v3/issues',

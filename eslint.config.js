@@ -26,6 +26,13 @@ export default ts.config(
         extraFileExtensions: ['.svelte'],
       },
     },
+    rules: {
+      // ESLint 10's `no-useless-assignment` has no awareness of Svelte runes.
+      // It flags `let { ref = $bindable(null) } = $props()` as a useless
+      // assignment because `ref` is never read inside the component, but the
+      // value is the default for a two-way bound prop and is read by the parent.
+      'no-useless-assignment': 'off',
+    },
   },
   {
     rules: {

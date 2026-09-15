@@ -1,4 +1,4 @@
-FROM oven/bun:1.3.0-slim
+FROM oven/bun:1.4.2-slim
 
 # Build argument to determine if this is production
 ARG BUILD_ENV=development
@@ -6,10 +6,12 @@ ARG BUILD_ENV=development
 WORKDIR /app
 
 # Copy package files
-COPY package.json bun.lockb* ./
+# NOTE: this project uses bun's text lockfile (bun.lock), not the legacy
+# binary bun.lockb. Copying it explicitly keeps installs reproducible.
+COPY package.json bun.lock ./
 
-# Install dependencies
-RUN bun install
+# Install dependencies (devDependencies are required to run the SvelteKit build)
+RUN bun install --frozen-lockfile
 
 # Copy application code
 COPY . .

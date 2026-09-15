@@ -70,7 +70,7 @@ export const getCachedContractInformation = async (
     return contract
   } catch (e) {
     consola.error(e)
-    throw new Error('Failed to fetch contract information')
+    throw new Error('Failed to fetch contract information', { cause: e })
   }
 }
 
